@@ -1,0 +1,6 @@
+node_modules/
+config/.env
+cache/ads/*.jpg
+cache/ads/*.txt
+.DS_Store
+frontend-backup-bootstrap/
