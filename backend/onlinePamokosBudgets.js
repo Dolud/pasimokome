@@ -22,11 +22,11 @@ function saveBudgets(data) {
   fs.writeFileSync(BUDGETS_PATH, JSON.stringify(data, null, 2));
 }
 
-function getBudgetForMonth(monthKey) {
+function getBudgetField(monthKey, field) {
   const budgets = loadBudgets();
   const entry = budgets[monthKey];
-  if (!entry || entry.daily === undefined || entry.daily === null || entry.daily === '') return null;
-  const num = parseFloat(String(entry.daily).replace(',', '.').replace(/[^\d.-]/g, ''));
+  if (!entry || entry[field] === undefined || entry[field] === null || entry[field] === '') return null;
+  const num = parseFloat(String(entry[field]).replace(',', '.').replace(/[^\d.-]/g, ''));
   return isNaN(num) ? null : num;
 }
 
@@ -34,4 +34,4 @@ function getBudgets() {
   return loadBudgets();
 }
 
-module.exports = { loadBudgets, saveBudgets, getBudgetForMonth, getBudgets };
+module.exports = { loadBudgets, saveBudgets, getBudgetField, getBudgets };

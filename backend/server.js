@@ -15,7 +15,7 @@ const { matchSource, getAllowedSources } = require('./sourceMatcher');
 const { calculateSpendWithVAT, calculateCPL } = require('./calculations');
 const { getPlanasAmount, getLeadsPlanasAmount, getOnlinePamokosPlanasAmount, getOnlinePamokosLeadsPlanasAmount, getStovyklaDealsCountPlanasAmount, getOnlinePamokosDealsCountPlanasAmount, getStovyklaSumaAmount, getMonthSheetName, getDaysInRange, resetSheetsClient } = require('./googleSheets');
 const { worker: adImageWorker } = require('./adImageWorker');
-const { getBudgetForMonth, getBudgets, saveBudgets } = require('./onlinePamokosBudgets');
+const { getBudgetField, getBudgets, saveBudgets } = require('./onlinePamokosBudgets');
 
 const app = express();
 app.set('trust proxy', true);
@@ -993,7 +993,7 @@ app.get('/api/online-pamokos/deals', async (req, res) => {
   }
 });
 
-function getLocalOnlinePamokosPlanas(startDate, endDate) {
+function getLocalOnlinePamokosValue(startDate, endDate, field) {
   const months = new Set();
   const start = new Date(startDate);
   const end = new Date(endDate);
@@ -1004,7 +1004,7 @@ function getLocalOnlinePamokosPlanas(startDate, endDate) {
   }
   let total = 0;
   for (const monthKey of months) {
-    const daily = getBudgetForMonth(monthKey);
+    const daily = getBudgetField(monthKey, field);
     if (daily === null) continue;
     const days = getDaysInRange(startDate, endDate, monthKey);
     total += daily * days;
@@ -1018,21 +1018,21 @@ app.get('/api/online-pamokos/planas', (req, res) => {
     if (!startDate || !endDate) {
       return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
     }
-    const planas = getLocalOnlinePamokosPlanas(startDate, endDate);
+    const planas = getLocalOnlinePamokosValue(startDate, endDate, 'daily');
     res.json({ success: true, planas });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.get('/api/online-pamokos/leads-planas', async (req, res) => {
+app.get('/api/online-pamokos/leads-planas', (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     if (!startDate || !endDate) {
       return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
     }
 
-    const leadsPlanas = await getOnlinePamokosLeadsPlanasAmount(startDate, endDate);
+    const leadsPlanas = getLocalOnlinePamokosValue(startDate, endDate, 'leads_daily');
     res.json({ success: true, leadsPlanas });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -1285,14 +1285,14 @@ app.get('/api/deals/suma', async (req, res) => {
   }
 });
 
-app.get('/api/online-pamokos/deals/planas-kiekis', async (req, res) => {
+app.get('/api/online-pamokos/deals/planas-kiekis', (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     if (!startDate || !endDate) {
       return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
     }
 
-    const planas = await getOnlinePamokosDealsCountPlanasAmount(startDate, endDate);
+    const planas = getLocalOnlinePamokosValue(startDate, endDate, 'deals_daily');
     res.json({ success: true, planas });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -1305,7 +1305,7 @@ app.get('/api/online-pamokos/deals/planas', (req, res) => {
     if (!startDate || !endDate) {
       return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
     }
-    const planas = getLocalOnlinePamokosPlanas(startDate, endDate);
+    const planas = getLocalOnlinePamokosValue(startDate, endDate, 'daily');
     res.json({ success: true, planas });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

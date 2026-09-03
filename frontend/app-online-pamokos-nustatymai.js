@@ -5,34 +5,55 @@ function budgetApp() {
     saveMessage: '',
     saveError: false,
     months: [],
+    years: [],
+    selectedYear: new Date().getFullYear(),
 
     init() {
+      this.generateYears();
       this.generateMonths();
       this.loadBudgets();
     },
 
+    generateYears() {
+      const currentYear = new Date().getFullYear();
+      this.years = [];
+      for (let y = 2025; y <= currentYear + 1; y++) {
+        this.years.push(y);
+      }
+    },
+
     generateMonths() {
-      const now = new Date();
-      const year = now.getFullYear();
       const monthNames = [
         'Sausis', 'Vasaris', 'Kovas', 'Balandis', 'Gegužė', 'Birželis',
         'Liepa', 'Rugpjūtis', 'Rugsėjis', 'Spalis', 'Lapkritis', 'Gruodis'
       ];
       this.months = [];
       for (let m = 1; m <= 12; m++) {
-        const key = `${year} ${String(m).padStart(2, '0')}`;
-        this.months.push({ key, label: `${monthNames[m - 1]} ${year}` });
+        const key = `${this.selectedYear} ${String(m).padStart(2, '0')}`;
+        this.months.push({ key, label: monthNames[m - 1] });
       }
     },
 
+    getField(monthKey, field) {
+      const entry = this.budgets[monthKey];
+      if (!entry || entry[field] === undefined || entry[field] === null) return '';
+      return String(entry[field]);
+    },
+
+    setField(monthKey, field, value) {
+      if (!this.budgets[monthKey]) {
+        this.budgets[monthKey] = {};
+      }
+      this.budgets[monthKey][field] = value;
+    },
+
     async loadBudgets() {
+      this.generateMonths();
       try {
         const res = await fetch('/api/online-pamokos/budgets');
         const data = await res.json();
         if (data.success) {
-          for (const [key, entry] of Object.entries(data.budgets)) {
-            this.budgets[key] = entry.daily !== undefined && entry.daily !== null ? String(entry.daily) : '';
-          }
+          this.budgets = data.budgets || {};
         }
       } catch (e) {}
     },
@@ -44,9 +65,17 @@ function budgetApp() {
 
       const payload = {};
       for (const month of this.months) {
-        const val = this.budgets[month.key];
-        if (val !== undefined && val !== null && String(val).trim() !== '') {
-          payload[month.key] = { daily: val };
+        const entry = this.budgets[month.key];
+        if (entry) {
+          const cleaned = {};
+          for (const [k, v] of Object.entries(entry)) {
+            if (v !== undefined && v !== null && String(v).trim() !== '') {
+              cleaned[k] = v;
+            }
+          }
+          if (Object.keys(cleaned).length > 0) {
+            payload[month.key] = cleaned;
+          }
         }
       }
 
