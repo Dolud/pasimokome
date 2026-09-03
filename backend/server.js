@@ -13,8 +13,9 @@ const { getNormalizedCampaigns: getGoogleAdsCampaigns, getDailyCampaignData: get
 const { buildDashboard, buildGoogleAdsRows } = require('./dashboard');
 const { matchSource, getAllowedSources } = require('./sourceMatcher');
 const { calculateSpendWithVAT, calculateCPL } = require('./calculations');
-const { getPlanasAmount, getLeadsPlanasAmount, getOnlinePamokosPlanasAmount, getOnlinePamokosLeadsPlanasAmount, getStovyklaDealsCountPlanasAmount, getOnlinePamokosDealsCountPlanasAmount, getStovyklaSumaAmount, resetSheetsClient } = require('./googleSheets');
+const { getPlanasAmount, getLeadsPlanasAmount, getOnlinePamokosPlanasAmount, getOnlinePamokosLeadsPlanasAmount, getStovyklaDealsCountPlanasAmount, getOnlinePamokosDealsCountPlanasAmount, getStovyklaSumaAmount, getMonthSheetName, getDaysInRange, resetSheetsClient } = require('./googleSheets');
 const { worker: adImageWorker } = require('./adImageWorker');
+const { getBudgetForMonth, getBudgets, saveBudgets } = require('./onlinePamokosBudgets');
 
 const app = express();
 app.set('trust proxy', true);
@@ -992,14 +993,32 @@ app.get('/api/online-pamokos/deals', async (req, res) => {
   }
 });
 
-app.get('/api/online-pamokos/planas', async (req, res) => {
+function getLocalOnlinePamokosPlanas(startDate, endDate) {
+  const months = new Set();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const current = new Date(start);
+  while (current <= end) {
+    months.add(getMonthSheetName(current));
+    current.setDate(current.getDate() + 1);
+  }
+  let total = 0;
+  for (const monthKey of months) {
+    const daily = getBudgetForMonth(monthKey);
+    if (daily === null) continue;
+    const days = getDaysInRange(startDate, endDate, monthKey);
+    total += daily * days;
+  }
+  return Math.round(total * 100) / 100;
+}
+
+app.get('/api/online-pamokos/planas', (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     if (!startDate || !endDate) {
       return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
     }
-
-    const planas = await getOnlinePamokosPlanasAmount(startDate, endDate);
+    const planas = getLocalOnlinePamokosPlanas(startDate, endDate);
     res.json({ success: true, planas });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -1015,6 +1034,23 @@ app.get('/api/online-pamokos/leads-planas', async (req, res) => {
 
     const leadsPlanas = await getOnlinePamokosLeadsPlanasAmount(startDate, endDate);
     res.json({ success: true, leadsPlanas });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/online-pamokos/budgets', (req, res) => {
+  res.json({ success: true, budgets: getBudgets() });
+});
+
+app.post('/api/online-pamokos/budgets', (req, res) => {
+  try {
+    const { budgets } = req.body;
+    if (!budgets || typeof budgets !== 'object') {
+      return res.status(400).json({ success: false, error: 'Invalid budgets data' });
+    }
+    saveBudgets(budgets);
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -1263,14 +1299,13 @@ app.get('/api/online-pamokos/deals/planas-kiekis', async (req, res) => {
   }
 });
 
-app.get('/api/online-pamokos/deals/planas', async (req, res) => {
+app.get('/api/online-pamokos/deals/planas', (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     if (!startDate || !endDate) {
       return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
     }
-
-    const planas = await getOnlinePamokosPlanasAmount(startDate, endDate);
+    const planas = getLocalOnlinePamokosPlanas(startDate, endDate);
     res.json({ success: true, planas });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -1295,6 +1330,10 @@ app.get('/online-pamokos', (req, res) => {
 
 app.get('/online-pamokos/deals', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/deals-online-pamokos.html'));
+});
+
+app.get('/online-pamokos/nustatymai', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/online-pamokos-nustatymai.html'));
 });
 
 // === Settings ===
