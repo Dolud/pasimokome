@@ -1,4 +1,6 @@
 const path = require('path');
+const { loadSettings } = require('./settings');
+loadSettings();
 require('dotenv').config({ path: path.join(__dirname, '../config/.env') });
 
 const express = require('express');
@@ -1028,7 +1030,7 @@ app.get('/auth/google/callback', async (req, res) => {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      'https://dolud.com/marketingas/auth/google/callback'
+      'http://localhost:3000/auth/google/callback'
     );
 
     const { tokens } = await oauth2Client.getToken(code);
@@ -1065,7 +1067,7 @@ app.get('/auth/google-ads', (req, res) => {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_ADS_CLIENT_ID,
     process.env.GOOGLE_ADS_CLIENT_SECRET,
-    'https://dolud.com/marketingas/oauth2callback'
+    'http://localhost:3000/oauth2callback'
   );
 
   const scopes = ['https://www.googleapis.com/auth/adwords'];
@@ -1088,7 +1090,7 @@ app.get('/oauth2callback', async (req, res) => {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_ADS_CLIENT_ID,
       process.env.GOOGLE_ADS_CLIENT_SECRET,
-      'https://dolud.com/marketingas/oauth2callback'
+      'http://localhost:3000/oauth2callback'
     );
 
     const { tokens } = await oauth2Client.getToken(code);
@@ -1239,6 +1241,98 @@ app.get('/online-pamokos', (req, res) => {
 
 app.get('/online-pamokos/deals', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/deals-online-pamokos.html'));
+});
+
+// === Settings ===
+
+const crypto = require('crypto');
+const { getSettings: getSettingsData, saveSettings: saveSettingsData, verifyPassword: verifySettingsPassword, testBitrix, testMeta, testGoogleSheets, testGoogleAds } = require('./settings');
+
+const settingsSessions = new Map();
+const SESSION_TTL = 24 * 60 * 60 * 1000;
+
+function generateSessionToken() {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+function isValidSession(token) {
+  if (!token) return false;
+  const session = settingsSessions.get(token);
+  if (!session) return false;
+  if (Date.now() - session.ts > SESSION_TTL) {
+    settingsSessions.delete(token);
+    return false;
+  }
+  return true;
+}
+
+app.get('/settings', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/settings.html'));
+});
+
+app.post('/api/settings/login', (req, res) => {
+  const { password } = req.body;
+  if (!password) {
+    return res.status(400).json({ success: false, error: 'Slaptažodis privalomas' });
+  }
+  if (!verifySettingsPassword(password)) {
+    return res.status(401).json({ success: false, error: 'Neteisingas slaptažodis' });
+  }
+  const token = generateSessionToken();
+  settingsSessions.set(token, { ts: Date.now() });
+  res.json({ success: true, token });
+});
+
+app.get('/api/settings', (req, res) => {
+  const auth = req.headers.authorization;
+  const token = auth && auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (!isValidSession(token)) {
+    return res.status(401).json({ success: false, error: 'Prisijunkite' });
+  }
+  res.json({ success: true, settings: getSettingsData() });
+});
+
+app.post('/api/settings', (req, res) => {
+  const auth = req.headers.authorization;
+  const token = auth && auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (!isValidSession(token)) {
+    return res.status(401).json({ success: false, error: 'Prisijunkite' });
+  }
+  try {
+    saveSettingsData(req.body);
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.post('/api/settings/test', async (req, res) => {
+  const auth = req.headers.authorization;
+  const token = auth && auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (!isValidSession(token)) {
+    return res.status(401).json({ success: false, error: 'Prisijunkite' });
+  }
+  try {
+    const [r1, r2, r3, r4] = await Promise.all([
+      testBitrix(),
+      testMeta(),
+      testGoogleSheets(),
+      testGoogleAds(),
+    ]);
+    res.json({
+      success: true,
+      results: { bitrix: r1, meta: r2, googleSheets: r3, googleAds: r4 }
+    });
+  } catch (e) {
+    res.status(500).json({ success: false, error: e.message });
+  }
+});
+
+app.post('/api/settings/logout', (req, res) => {
+  const auth = req.headers.authorization;
+  const token = auth && auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (token) settingsSessions.delete(token);
+  res.json({ success: true });
 });
 
 app.listen(PORT, () => {

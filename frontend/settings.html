@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nustatymai - Marketing Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { outfit: ['Outfit', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#ecf3ff',100:'#dde9ff',200:'#c2d6ff',300:'#9cb9ff',400:'#7592ff',500:'#465fff',600:'#3641f5',700:'#2a31d8',800:'#252dae',900:'#262e89' },
+            success: { 50:'#f0fdf4',500:'#22c55e',600:'#16a34a' },
+            error: { 50:'#fef2f2',500:'#ef4444',600:'#dc2626' },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    body { font-family: 'Outfit', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 font-outfit min-h-screen" x-data="settingsApp()" x-init="await init()">
+
+  <!-- Login Screen -->
+  <div x-show="!authenticated" class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-sm">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div class="text-center mb-6">
+          <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-brand-500/10 mb-3">
+            <svg class="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+          </div>
+          <h1 class="text-xl font-semibold text-gray-800">Nustatymai</h1>
+          <p class="text-sm text-gray-500 mt-1">Prisijunkite prie nustatymų</p>
+        </div>
+
+        <div x-show="loginError" class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-600" x-text="loginError"></div>
+
+        <form @submit.prevent="login">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">Slaptažodis</label>
+            <input type="password" x-model="loginPassword"
+              class="w-full px-3.5 py-2.5 rounded-lg border border-gray-300 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition"
+              placeholder="Įveskite slaptažodį" autofocus>
+          </div>
+          <button type="submit" :disabled="loginLoading"
+            class="w-full py-2.5 px-4 rounded-lg bg-brand-500 text-white text-sm font-medium hover:bg-brand-600 transition disabled:opacity-50">
+            <span x-show="!loginLoading">Prisijungti</span>
+            <span x-show="loginLoading">Jungiamasi...</span>
+          </button>
+        </form>
+      </div>
+      <div class="text-center mt-4">
+        <a href="/" class="text-sm text-gray-500 hover:text-brand-500 transition">&larr; Atgal į dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Form -->
+  <div x-show="authenticated" class="max-w-3xl mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-2xl font-semibold text-gray-800">Nustatymai</h1>
+        <p class="text-sm text-gray-500 mt-1">API raktų ir prisijungimų valdymas</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/" class="text-sm text-gray-500 hover:text-brand-500 transition">Dashboard</a>
+        <button @click="logout()"
+          class="px-3.5 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+          Atsijungti
+        </button>
+      </div>
+    </div>
+
+    <!-- Status Banner -->
+    <div x-show="testResults" class="mb-6 p-4 rounded-xl border"
+      :class="allOk ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'">
+      <div class="flex items-center gap-2">
+        <template x-if="allOk">
+          <div class="flex items-center gap-2 text-green-700">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+            <span class="text-sm font-medium">Visi API veikia teisingai</span>
+          </div>
+        </template>
+        <template x-if="!allOk">
+          <div class="flex items-center gap-2 text-yellow-700">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+            <span class="text-sm font-medium">Kai kurie API neveikia</span>
+          </div>
+        </template>
+      </div>
+    </div>
+
+    <!-- API Groups -->
+    <div class="space-y-4">
+      <template x-for="(group, groupKey) in settings" :key="groupKey">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          <!-- Group Header -->
+          <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 bg-gray-50/50">
+            <div class="flex items-center gap-3">
+              <h3 class="text-sm font-semibold text-gray-800" x-text="group.label"></h3>
+              <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium"
+                :class="getStatusClass(groupKey)">
+                <span class="w-1.5 h-1.5 rounded-full" :class="getStatusDotClass(groupKey)"></span>
+                <span x-text="getStatusText(groupKey)"></span>
+              </span>
+            </div>
+            <button @click="testGroup(groupKey)" :disabled="testingGroup === groupKey"
+              class="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100 transition disabled:opacity-50">
+              <span x-show="testingGroup !== groupKey">Patikrinti</span>
+              <span x-show="testingGroup === groupKey">Tikrinama...</span>
+            </button>
+          </div>
+          <!-- Fields -->
+          <div class="p-5 space-y-3.5">
+            <template x-for="field in group.fields" :key="field.key">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1" x-text="field.label"></label>
+                <div class="relative">
+                  <input :type="field.type === 'password' && !showFields[field.key] ? 'password' : 'text'"
+                    :value="field.value"
+                    @input="field.value = $event.target.value"
+                    class="w-full px-3.5 py-2 rounded-lg border border-gray-300 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition pr-10"
+                    :placeholder="field.label">
+                  <button x-show="field.type === 'password'" type="button" @click="showFields[field.key] = !showFields[field.key]"
+                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition">
+                    <svg x-show="!showFields[field.key]" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    <svg x-show="showFields[field.key]" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path></svg>
+                  </button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Change Password -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden mt-4">
+      <div class="px-5 py-3.5 border-b border-gray-100 bg-gray-50/50">
+        <h3 class="text-sm font-semibold text-gray-800">Keisti slaptažodį</h3>
+      </div>
+      <div class="p-5">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 mb-1">Naujas slaptažodis</label>
+          <input type="password" x-model="newPassword"
+            class="w-full px-3.5 py-2 rounded-lg border border-gray-300 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition"
+            placeholder="Palikite tuščią, jei nenorite keisti">
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between mt-6 pb-8">
+      <button @click="testAll()" :disabled="testingAll"
+        class="px-5 py-2.5 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50">
+        <span x-show="!testingAll">Patikrinti visus</span>
+        <span x-show="testingAll">Tikrinama...</span>
+      </button>
+      <button @click="save()" :disabled="saving"
+        class="px-5 py-2.5 rounded-lg bg-brand-500 text-white text-sm font-medium hover:bg-brand-600 transition disabled:opacity-50">
+        <span x-show="!saving">Išsaugoti</span>
+        <span x-show="saving">Saugoma...</span>
+      </button>
+    </div>
+
+    <!-- Save Success -->
+    <div x-show="saveMessage" x-transition class="fixed bottom-6 right-6 px-5 py-3 rounded-xl shadow-lg text-sm font-medium"
+      :class="saveError ? 'bg-red-500 text-white' : 'bg-green-500 text-white'" x-text="saveMessage"></div>
+  </div>
+
+  <script src="settings.js"></script>
+</body>
+</html>
