@@ -3,9 +3,9 @@ const fs = require('fs');
 require('dotenv').config({ path: path.join(__dirname, '../config/.env') });
 const { worker: adImageWorker, CACHE_DIR } = require('./adImageWorker');
 
-const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
-const META_PAGE_ACCESS_TOKEN = process.env.META_PAGE_ACCESS_TOKEN;
-const META_AD_ACCOUNT_ID = process.env.META_AD_ACCOUNT_ID;
+function getAccessToken() { return process.env.META_ACCESS_TOKEN; }
+function getPageAccessToken() { return process.env.META_PAGE_ACCESS_TOKEN; }
+function getAdAccountId() { return process.env.META_AD_ACCOUNT_ID; }
 
 const STOVYKLA_CAMPAIGNS = [
   'Profesijų pasaulis (lead generation)',
@@ -22,12 +22,14 @@ const ONLINE_PAMOKOS_CAMPAIGNS = [
 ];
 
 async function metaRequest(endpoint, params = {}) {
-  if (!META_ACCESS_TOKEN || !META_AD_ACCOUNT_ID) {
-    throw new Error('META_ACCESS_TOKEN and META_AD_ACCOUNT_ID must be set in .env');
+  const accessToken = getAccessToken();
+  const adAccountId = getAdAccountId();
+  if (!accessToken || !adAccountId) {
+    throw new Error('META_ACCESS_TOKEN and META_AD_ACCOUNT_ID must be set');
   }
 
-  const url = new URL(`https://graph.facebook.com/v21.0/${META_AD_ACCOUNT_ID}/${endpoint}`);
-  url.searchParams.set('access_token', META_ACCESS_TOKEN);
+  const url = new URL(`https://graph.facebook.com/v21.0/${adAccountId}/${endpoint}`);
+  url.searchParams.set('access_token', accessToken);
   Object.entries(params).forEach(([key, val]) => {
     if (val !== undefined && val !== null) url.searchParams.set(key, val);
   });
@@ -42,12 +44,13 @@ async function metaRequest(endpoint, params = {}) {
 }
 
 async function metaNodeRequest(path, params = {}) {
-  if (!META_ACCESS_TOKEN) {
-    throw new Error('META_ACCESS_TOKEN must be set in .env');
+  const accessToken = getAccessToken();
+  if (!accessToken) {
+    throw new Error('META_ACCESS_TOKEN must be set');
   }
 
   const url = new URL(`https://graph.facebook.com/v21.0/${path}`);
-  url.searchParams.set('access_token', META_ACCESS_TOKEN);
+  url.searchParams.set('access_token', accessToken);
   Object.entries(params).forEach(([key, val]) => {
     if (val !== undefined && val !== null) url.searchParams.set(key, val);
   });
@@ -63,8 +66,9 @@ async function metaNodeRequest(path, params = {}) {
 
 async function paginate(path, params = {}) {
   const rows = [];
+  const accessToken = getAccessToken();
   let url = new URL(`https://graph.facebook.com/v21.0/${path}`);
-  url.searchParams.set('access_token', META_ACCESS_TOKEN);
+  url.searchParams.set('access_token', accessToken);
   Object.entries(params).forEach(([key, val]) => {
     if (val !== undefined && val !== null) url.searchParams.set(key, val);
   });
@@ -84,12 +88,13 @@ async function paginate(path, params = {}) {
 }
 
 async function pageRequest(path, params = {}) {
-  if (!META_PAGE_ACCESS_TOKEN) {
-    throw new Error('META_PAGE_ACCESS_TOKEN must be set in .env');
+  const pageAccessToken = getPageAccessToken();
+  if (!pageAccessToken) {
+    throw new Error('META_PAGE_ACCESS_TOKEN must be set');
   }
 
   const url = new URL(`https://graph.facebook.com/v21.0/${path}`);
-  url.searchParams.set('access_token', META_PAGE_ACCESS_TOKEN);
+  url.searchParams.set('access_token', pageAccessToken);
   Object.entries(params).forEach(([key, val]) => {
     if (val !== undefined && val !== null) url.searchParams.set(key, val);
   });
@@ -346,8 +351,8 @@ async function resolveAdImages(adsByCampaign) {
     for (let i = 0; i < freshHashes.length; i += chunkSize) {
       const chunk = freshHashes.slice(i, i + chunkSize);
       try {
-        const url = new URL(`https://graph.facebook.com/v21.0/${META_AD_ACCOUNT_ID}/adimages`);
-        url.searchParams.set('access_token', META_ACCESS_TOKEN);
+        const url = new URL(`https://graph.facebook.com/v21.0/${getAdAccountId()}/adimages`);
+        url.searchParams.set('access_token', getAccessToken());
         chunk.forEach((h, idx) => url.searchParams.set(`hashes[${idx}]`, h));
         url.searchParams.set('fields', 'url,width,height');
         const r = await (await fetch(url.toString())).json();

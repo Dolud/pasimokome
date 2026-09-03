@@ -4,7 +4,6 @@ const os = require('os');
 const { spawn } = require('child_process');
 require('dotenv').config({ path: path.join(__dirname, '../config/.env') });
 
-const META_ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
 const CHROME_PATH = process.env.CHROME_PATH || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const CACHE_DIR = path.join(__dirname, '../cache/ads');
 const PORT = 9333;
@@ -233,7 +232,7 @@ class AdImageWorker {
       : ['DESKTOP_FEED_STANDARD', 'FACEBOOK_REELS_MOBILE'];
 
     for (const fmt of formats) {
-      const previewUrl = `https://graph.facebook.com/${PREVIEW_API_VERSION}/${adId}/previews?access_token=${encodeURIComponent(META_ACCESS_TOKEN)}&ad_format=${fmt}`;
+      const previewUrl = `https://graph.facebook.com/${PREVIEW_API_VERSION}/${adId}/previews?access_token=${encodeURIComponent(process.env.META_ACCESS_TOKEN)}&ad_format=${fmt}`;
       let body = null;
       try {
         const p = await (await fetch(previewUrl)).json();

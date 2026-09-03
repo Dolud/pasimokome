@@ -1300,6 +1300,8 @@ app.post('/api/settings', (req, res) => {
   }
   try {
     saveSettingsData(req.body);
+    resetSheetsClient();
+    resetOAuth2Client();
     res.json({ success: true });
   } catch (e) {
     res.status(500).json({ success: false, error: e.message });

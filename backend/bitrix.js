@@ -1,10 +1,9 @@
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../config/.env') });
 
-const BITRIX_WEBHOOK = process.env.BITRIX_WEBHOOK;
-
 async function bitrixRequest(method, params = {}) {
-  const url = `${BITRIX_WEBHOOK}${method}`;
+  const webhook = process.env.BITRIX_WEBHOOK;
+  const url = `${webhook}${method}`;
 
   const response = await fetch(url, {
     method: 'POST',

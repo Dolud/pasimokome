@@ -2,8 +2,6 @@ const { google } = require('googleapis');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../config/.env') });
 
-const SPREADSHEET_ID = process.env.GOOGLE_SPREADSHEET_ID;
-
 let sheetsClient = null;
 
 function resetSheetsClient() { sheetsClient = null; }
@@ -36,7 +34,7 @@ async function getSheetsClient() {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    'https://dolud.com/marketingas/auth/google/callback'
+    'http://localhost:3000/auth/google/callback'
   );
 
   oauth2Client.setCredentials({
@@ -51,8 +49,9 @@ async function getSheetValue(sheetName, cell) {
   const sheets = await getSheetsClient();
   const range = `'${sheetName}'!${cell}`;
 
+  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
   const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: SPREADSHEET_ID,
+    spreadsheetId,
     range,
   });
 

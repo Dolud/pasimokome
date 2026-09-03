@@ -2,21 +2,17 @@ const { google } = require('googleapis');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../config/.env') });
 
-const DEVELOPER_TOKEN = process.env.GOOGLE_ADS_DEVELOPER_TOKEN;
-const CLIENT_ID = process.env.GOOGLE_ADS_CLIENT_ID;
-const CLIENT_SECRET = process.env.GOOGLE_ADS_CLIENT_SECRET;
-const REFRESH_TOKEN = process.env.GOOGLE_ADS_REFRESH_TOKEN;
-const CUSTOMER_ID = process.env.GOOGLE_ADS_CUSTOMER_ID;
-const LOGIN_CUSTOMER_ID = process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID;
-
 let oauth2Client = null;
 
 function resetOAuth2Client() { oauth2Client = null; }
 
 function getOAuth2Client() {
   if (oauth2Client) return oauth2Client;
-  oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET);
-  oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+  const clientId = process.env.GOOGLE_ADS_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_ADS_CLIENT_SECRET;
+  const refreshToken = process.env.GOOGLE_ADS_REFRESH_TOKEN;
+  oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
   return oauth2Client;
 }
 
@@ -28,14 +24,15 @@ async function getAccessToken() {
 
 async function googleAdsRequest(query) {
   const token = await getAccessToken();
-  const url = `https://googleads.googleapis.com/v25/customers/${CUSTOMER_ID}/googleAds:searchStream`;
+  const customerId = process.env.GOOGLE_ADS_CUSTOMER_ID;
+  const url = `https://googleads.googleapis.com/v25/customers/${customerId}/googleAds:searchStream`;
 
   const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${token}`,
-      'developer-token': DEVELOPER_TOKEN,
-      'login-customer-id': LOGIN_CUSTOMER_ID,
+      'developer-token': process.env.GOOGLE_ADS_DEVELOPER_TOKEN,
+      'login-customer-id': process.env.GOOGLE_ADS_LOGIN_CUSTOMER_ID,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({ query })
