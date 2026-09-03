@@ -1019,6 +1019,23 @@ app.get('/api/online-pamokos/leads-planas', async (req, res) => {
   }
 });
 
+app.get('/auth/google', (req, res) => {
+  const base = `${req.protocol}://${req.headers.host}`;
+  const redirectUri = `${base}/auth/google/callback`;
+  const oauth2Client = new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    redirectUri
+  );
+  const scopes = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
+  const url = oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes,
+    prompt: 'consent'
+  });
+  res.redirect(url);
+});
+
 app.get('/auth/google/callback', async (req, res) => {
   console.log('[oauth] callback hit with URL:', req.originalUrl);
   const { code } = req.query;
@@ -1026,35 +1043,30 @@ app.get('/auth/google/callback', async (req, res) => {
     return res.status(400).send('No authorization code provided');
   }
 
+  const base = `${req.protocol}://${req.headers.host}`;
+  const redirectUri = `${base}/auth/google/callback`;
+
   try {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      'http://localhost:3000/auth/google/callback'
+      redirectUri
     );
 
     const { tokens } = await oauth2Client.getToken(code);
     console.log('\n=== Google OAuth Token Received ===');
 
-    // Auto-update .env
-    const fs = require('fs');
-    const envPath = path.join(__dirname, '../config/.env');
-    let env = fs.readFileSync(envPath, 'utf8');
-    if (env.includes('GOOGLE_REFRESH_TOKEN=')) {
-      env = env.replace(/GOOGLE_REFRESH_TOKEN=.*/, `GOOGLE_REFRESH_TOKEN=${tokens.refresh_token}`);
-    } else {
-      env += `\nGOOGLE_REFRESH_TOKEN=${tokens.refresh_token}`;
-    }
-    fs.writeFileSync(envPath, env);
-    console.log('Refresh token saved to config/.env');
+    const { saveSettings: saveSettingsData } = require('./settings');
+    saveSettingsData({ GOOGLE_REFRESH_TOKEN: tokens.refresh_token });
+    console.log('Refresh token saved to settings.json');
 
-    // Reset sheets client so new token is used
     resetSheetsClient();
 
     res.send(`
       <html><body style="font-family:system-ui;padding:40px;text-align:center">
-        <h2>Authorization Successful!</h2>
-        <p>Refresh token saved. You can close this tab.</p>
+        <h2>Autorizacija sėkminga!</h2>
+        <p>Galite uždaryti šį langą.</p>
+        <script>setTimeout(() => window.close(), 1500)</script>
       </body></html>
     `);
   } catch (error) {
@@ -1064,10 +1076,12 @@ app.get('/auth/google/callback', async (req, res) => {
 });
 
 app.get('/auth/google-ads', (req, res) => {
+  const base = `${req.protocol}://${req.headers.host}`;
+  const redirectUri = `${base}/oauth2callback`;
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_ADS_CLIENT_ID,
     process.env.GOOGLE_ADS_CLIENT_SECRET,
-    'http://localhost:3000/oauth2callback'
+    redirectUri
   );
 
   const scopes = ['https://www.googleapis.com/auth/adwords'];
@@ -1086,40 +1100,79 @@ app.get('/oauth2callback', async (req, res) => {
     return res.status(400).send('No authorization code provided');
   }
 
+  const base = `${req.protocol}://${req.headers.host}`;
+  const redirectUri = `${base}/oauth2callback`;
+
   try {
     const oauth2Client = new google.auth.OAuth2(
       process.env.GOOGLE_ADS_CLIENT_ID,
       process.env.GOOGLE_ADS_CLIENT_SECRET,
-      'http://localhost:3000/oauth2callback'
+      redirectUri
     );
 
     const { tokens } = await oauth2Client.getToken(code);
     console.log('\n=== Google Ads OAuth Token Received ===');
 
-    // Auto-update .env
-    const fs = require('fs');
-    const envPath = path.join(__dirname, '../config/.env');
-    let env = fs.readFileSync(envPath, 'utf8');
-    if (env.includes('GOOGLE_ADS_REFRESH_TOKEN=')) {
-      env = env.replace(/GOOGLE_ADS_REFRESH_TOKEN=.*/, `GOOGLE_ADS_REFRESH_TOKEN=${tokens.refresh_token}`);
-    } else {
-      env += `\nGOOGLE_ADS_REFRESH_TOKEN=${tokens.refresh_token}`;
-    }
-    fs.writeFileSync(envPath, env);
-    console.log('Google Ads refresh token saved to config/.env');
+    const { saveSettings: saveSettingsData } = require('./settings');
+    saveSettingsData({ GOOGLE_ADS_REFRESH_TOKEN: tokens.refresh_token });
+    console.log('Google Ads refresh token saved to settings.json');
 
     resetOAuth2Client();
 
     res.send(`
       <html><body style="font-family:system-ui;padding:40px;text-align:center">
-        <h2>Google Ads Authorization Successful!</h2>
-        <p>Refresh token saved. You can close this tab.</p>
+        <h2>Google Ads autorizacija sėkminga!</h2>
+        <p>Galite uždaryti šį langą.</p>
+        <script>setTimeout(() => window.close(), 1500)</script>
       </body></html>
     `);
   } catch (error) {
     console.error('OAuth error:', error.message);
     res.status(500).send('Authorization failed: ' + error.message);
   }
+});
+
+app.get('/api/settings/auth-url/:service', (req, res) => {
+  const auth = req.headers.authorization;
+  const token = auth && auth.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (!isValidSession(token)) {
+    return res.status(401).json({ success: false, error: 'Prisijunkite' });
+  }
+
+  const base = `${req.protocol}://${req.headers.host}`;
+  const { service } = req.params;
+
+  if (service === 'google-sheets') {
+    const redirectUri = `${base}/auth/google/callback`;
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      redirectUri
+    );
+    const url = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+      prompt: 'consent'
+    });
+    return res.json({ success: true, url });
+  }
+
+  if (service === 'google-ads') {
+    const redirectUri = `${base}/oauth2callback`;
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_ADS_CLIENT_ID,
+      process.env.GOOGLE_ADS_CLIENT_SECRET,
+      redirectUri
+    );
+    const url = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: ['https://www.googleapis.com/auth/adwords'],
+      prompt: 'consent'
+    });
+    return res.json({ success: true, url });
+  }
+
+  res.status(400).json({ success: false, error: 'Nežinomas servisas' });
 });
 
 app.get('/api/planas', async (req, res) => {

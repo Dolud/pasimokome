@@ -116,11 +116,23 @@
                 <span x-text="getStatusText(groupKey)"></span>
               </span>
             </div>
-            <button @click="testGroup(groupKey)" :disabled="testingGroup === groupKey"
-              class="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100 transition disabled:opacity-50">
-              <span x-show="testingGroup !== groupKey">Patikrinti</span>
-              <span x-show="testingGroup === groupKey">Tikrinama...</span>
-            </button>
+            <div class="flex items-center gap-2">
+              <a x-show="groupKey === 'googleSheets' && testResults && testResults.googleSheets && !testResults.googleSheets.ok"
+                :href="'/auth/google'" target="_blank"
+                class="text-xs px-3 py-1.5 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition font-medium">
+                Autorizuoti
+              </a>
+              <a x-show="groupKey === 'googleAds' && testResults && testResults.googleAds && !testResults.googleAds.ok"
+                :href="'/auth/google-ads'" target="_blank"
+                class="text-xs px-3 py-1.5 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition font-medium">
+                Autorizuoti
+              </a>
+              <button @click="testGroup(groupKey)" :disabled="testingGroup === groupKey"
+                class="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100 transition disabled:opacity-50">
+                <span x-show="testingGroup !== groupKey">Patikrinti</span>
+                <span x-show="testingGroup === groupKey">Tikrinama...</span>
+              </button>
+            </div>
           </div>
           <!-- Fields -->
           <div class="p-5 space-y-3.5">
