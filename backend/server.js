@@ -17,6 +17,7 @@ const { getPlanasAmount, getLeadsPlanasAmount, getOnlinePamokosPlanasAmount, get
 const { worker: adImageWorker } = require('./adImageWorker');
 
 const app = express();
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 3000;
 
 const dealBundleCache = new Map();
