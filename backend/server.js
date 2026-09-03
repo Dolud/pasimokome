@@ -1406,6 +1406,33 @@ app.listen(PORT, () => {
   }, 2000);
 });
 
+app.get('/api/debug/sheets', async (req, res) => {
+  try {
+    const { google } = require('googleapis');
+    const oauth2Client = new google.auth.OAuth2(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET
+    );
+    oauth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+    const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
+    const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
+
+    const meta = await sheets.spreadsheets.get({ spreadsheetId, fields: 'sheets.properties.title' });
+    const sheetNames = meta.data.sheets.map(s => s.properties.title);
+
+    const firstSheet = sheetNames[0];
+    const headerRes = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `'${firstSheet}'!1:1`,
+    });
+    const headers = headerRes.data.values ? headerRes.data.values[0] : [];
+
+    res.json({ success: true, sheetCount: sheetNames.length, sheetNames, firstSheet, headers });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled rejection:', err.message);
 });
