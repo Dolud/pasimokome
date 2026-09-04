@@ -1400,7 +1400,7 @@ app.get('/online-pamokos/deals', (req, res) => {
 });
 
 app.get('/online-pamokos/nustatymai', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/online-pamokos-nustatymai.html'));
+  res.redirect('/nustatymai');
 });
 
 // === Settings ===
@@ -1427,7 +1427,11 @@ function isValidSession(token) {
 }
 
 app.get('/settings', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/settings.html'));
+  res.redirect('/nustatymai');
+});
+
+app.get('/nustatymai', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/nustatymai.html'));
 });
 
 app.post('/api/settings/login', (req, res) => {
