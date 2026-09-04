@@ -182,8 +182,8 @@
         </div>
         <button @click="scanCampaigns()" :disabled="scanningCampaigns"
           class="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100 transition disabled:opacity-50">
-          <span x-show="!scanningCampaigns">Nuskaityti kampanijas</span>
-          <span x-show="scanningCampaigns">Nuskaitoma...</span>
+          <span x-show="!scanningCampaigns"><svg class="inline w-3.5 h-3.5 mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Atnaujinti sąrašą</span>
+          <span x-show="scanningCampaigns">Atnaujinama...</span>
         </button>
       </div>
       <div x-show="campaigns.length > 0" class="p-5">
@@ -220,7 +220,7 @@
         </div>
       </div>
       <div x-show="campaigns.length === 0 && !scanningCampaigns" class="p-5 text-sm text-gray-500">
-        Paspauskite "Nuskaityti kampanijas" kad pamatytumėte visas Meta kampanijas
+        Dar nėra kampanijų. Spauskite "Atnaujinti sąrašą" kad pamatytumėte visas Meta kampanijas
       </div>
     </div>
 
