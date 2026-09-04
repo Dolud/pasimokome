@@ -74,7 +74,7 @@ const PLANAS_HEADER = 'Išleista marketingui (FB+Google su PVM) Stovyklos';
 async function findColumnForHeader(sheetName, headerText) {
   const sheets = await getSheetsClient();
   const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: SPREADSHEET_ID,
+    spreadsheetId: process.env.GOOGLE_SPREADSHEET_ID,
     range: `'${sheetName}'!1:1`,
   });
 
