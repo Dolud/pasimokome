@@ -19,6 +19,7 @@ function settingsApp() {
     saveError: false,
 
     campaigns: [],
+    products: [],
     scanningCampaigns: false,
     savingCampaigns: false,
 
@@ -52,6 +53,7 @@ function settingsApp() {
             this.settings = res.settings;
             this.initShowFields();
             this.loadExistingCampaigns();
+            this.loadProducts();
           } else {
             this.token = null;
             localStorage.removeItem('settings_token');
@@ -80,6 +82,15 @@ function settingsApp() {
           this.campaigns = Object.entries(res.mappings).map(([name, category]) => ({
             name, category
           }));
+        }
+      } catch (e) {}
+    },
+
+    async loadProducts() {
+      try {
+        const res = await this.api('GET', '/api/products');
+        if (res.success) {
+          this.products = res.products;
         }
       } catch (e) {}
     },

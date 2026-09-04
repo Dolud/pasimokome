@@ -8,8 +8,8 @@ function getAccessToken() { return process.env.META_ACCESS_TOKEN; }
 function getPageAccessToken() { return process.env.META_PAGE_ACCESS_TOKEN; }
 function getAdAccountId() { return process.env.META_AD_ACCOUNT_ID; }
 
-function getStovyklaCampaigns() { return getCampaignsForProduct('stovykla'); }
-function getOnlinePamokosCampaigns() { return getCampaignsForProduct('online_pamokos'); }
+function getStovyklaCampaigns() { return getCampaignsForProduct('101'); }
+function getOnlinePamokosCampaigns() { return getCampaignsForProduct('97'); }
 
 async function metaRequest(endpoint, params = {}) {
   const accessToken = getAccessToken();

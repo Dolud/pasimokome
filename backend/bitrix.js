@@ -111,4 +111,14 @@ async function getContactsByIds(ids) {
   return map;
 }
 
-module.exports = { bitrixRequest, getProfile, getLeadFields, getStatusList, getSourceStatusMap, getAllLeads, getDealSourceStatusMap, getContactSourceStatusMap, getContactsByIds };
+async function getProductList() {
+  const fields = await getLeadFields();
+  const productField = fields.result && fields.result.UF_CRM_1630505818393;
+  if (!productField || !productField.items) return [];
+  return productField.items.map(item => ({
+    id: item.ID,
+    name: item.VALUE,
+  }));
+}
+
+module.exports = { bitrixRequest, getProfile, getLeadFields, getStatusList, getSourceStatusMap, getAllLeads, getDealSourceStatusMap, getContactSourceStatusMap, getContactsByIds, getProductList };

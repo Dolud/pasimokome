@@ -7,7 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const { google } = require('googleapis');
 
-const { getProfile, getLeadFields, getStatusList, getSourceStatusMap, getAllLeads, bitrixRequest, getContactSourceStatusMap, getContactsByIds } = require('./bitrix');
+const { getProfile, getLeadFields, getStatusList, getSourceStatusMap, getAllLeads, bitrixRequest, getContactSourceStatusMap, getContactsByIds, getProductList } = require('./bitrix');
 const { getNormalizedCampaigns, getDailyCampaignData, getLeads, getAdLevelInsights, prewarmAdImages, normalizeCampaignName, getStovyklaCampaigns, getOnlinePamokosCampaigns } = require('./meta');
 const { getNormalizedCampaigns: getGoogleAdsCampaigns, getDailyCampaignData: getGoogleAdsDailyCampaignData, normalizeGoogleAdsCampaign, resetOAuth2Client } = require('./googleAds');
 const { buildDashboard, buildGoogleAdsRows } = require('./dashboard');
@@ -1109,6 +1109,15 @@ app.post('/api/campaigns', (req, res) => {
     }
     saveMapping({ campaigns });
     res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/products', async (req, res) => {
+  try {
+    const products = await getProductList();
+    res.json({ success: true, products });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

@@ -31,8 +31,8 @@ function getCampaignsForProduct(product) {
 
 function autoDetectCategory(campaignName) {
   const lower = campaignName.toLowerCase();
-  if (lower.includes('stovykla')) return 'stovykla';
-  return 'online_pamokos';
+  if (lower.includes('stovykla')) return '101';
+  return '97';
 }
 
 function getAllMappings() {

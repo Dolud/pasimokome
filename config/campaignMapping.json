@@ -1,12 +1,12 @@
 {
   "campaigns": {
-    "Profesijų pasaulis (lead generation)": "stovykla",
-    "Gyvūnų pasaulis(lead generation)": "stovykla",
-    "Kūryba ir mokslas (lead generation)": "stovykla",
-    "Stovykla (lead generation)": "stovykla",
-    "Online pamokos (lead generation)": "online_pamokos",
-    "Korepetitoriai (lead generation)": "online_pamokos",
-    "Online pamokos": "online_pamokos",
-    "Vasaros Akcija (lead generation)": "online_pamokos"
+    "Profesijų pasaulis (lead generation)": "101",
+    "Gyvūnų pasaulis(lead generation)": "101",
+    "Kūryba ir mokslas (lead generation)": "101",
+    "Stovykla (lead generation)": "101",
+    "Online pamokos (lead generation)": "97",
+    "Korepetitoriai (lead generation)": "97",
+    "Online pamokos": "97",
+    "Vasaros Akcija (lead generation)": "97"
   }
 }
