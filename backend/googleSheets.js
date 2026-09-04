@@ -377,14 +377,20 @@ async function getOnlinePamokosMonthData(monthSheetName) {
 
   const getVal = async (col) => {
     if (!col) return null;
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: `'${monthSheetName}'!${col}3`,
-    });
-    const vals = res.data.values;
-    if (!vals || !vals[0] || vals[0][0] === undefined || vals[0][0] === '') return null;
-    const num = parseFloat(String(vals[0][0]).replace(',', '.').replace(/[^\d.-]/g, ''));
-    return isNaN(num) ? null : num;
+    for (const row of [2, 3]) {
+      const res = await sheets.spreadsheets.values.get({
+        spreadsheetId,
+        range: `'${monthSheetName}'!${col}${row}`,
+      });
+      const vals = res.data.values;
+      if (!vals || !vals[0] || vals[0][0] === undefined || vals[0][0] === '') continue;
+      const raw = String(vals[0][0]);
+      const match = raw.match(/[\d]+([.,]\d+)?/);
+      if (!match) continue;
+      const num = parseFloat(match[0].replace(',', '.'));
+      if (!isNaN(num) && num !== 0) return num;
+    }
+    return null;
   };
 
   return {
