@@ -114,10 +114,17 @@ function updateCPLProgressBar() {
     return;
   }
 
-  // Lower is better for cost, so we invert the progress
-  const percent = Math.min((planas / cpl) * 100, 100);
-  bar.style.width = percent + '%';
-  bar.style.backgroundColor = spendGradientColor(percent);
+  // Lower cost is better
+  if (cpl > planas) {
+    // Over budget - 100% red
+    bar.style.width = '100%';
+    bar.style.backgroundColor = '#EF4444';
+  } else {
+    // Under budget - proportional green
+    const percent = (cpl / planas) * 100;
+    bar.style.width = percent + '%';
+    bar.style.backgroundColor = '#3AB493';
+  }
 }
 
 function updateDealsProgressBar() {
