@@ -13,7 +13,7 @@ const { getNormalizedCampaigns: getGoogleAdsCampaigns, getDailyCampaignData: get
 const { buildDashboard, buildGoogleAdsRows } = require('./dashboard');
 const { matchSource, getAllowedSources } = require('./sourceMatcher');
 const { calculateSpendWithVAT, calculateCPL } = require('./calculations');
-const { getPlanasAmount, getLeadsPlanasAmount, getOnlinePamokosPlanasAmount, getOnlinePamokosLeadsPlanasAmount, getStovyklaDealsCountPlanasAmount, getOnlinePamokosDealsCountPlanasAmount, getStovyklaSumaAmount, getMonthSheetName, getDaysInRange, resetSheetsClient } = require('./googleSheets');
+const { getPlanasAmount, getLeadsPlanasAmount, getOnlinePamokosPlanasAmount, getOnlinePamokosLeadsPlanasAmount, getStovyklaDealsCountPlanasAmount, getOnlinePamokosDealsCountPlanasAmount, getStovyklaSumaAmount, getMonthSheetName, getDaysInRange, getOnlinePamokosMonthData, resetSheetsClient } = require('./googleSheets');
 const { worker: adImageWorker } = require('./adImageWorker');
 const { getBudgetField, getBudgets, saveBudgets } = require('./onlinePamokosBudgets');
 
@@ -1051,6 +1051,31 @@ app.post('/api/online-pamokos/budgets', (req, res) => {
     }
     saveBudgets(budgets);
     res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/online-pamokos/budgets/import', async (req, res) => {
+  try {
+    const { year } = req.body;
+    if (!year) {
+      return res.status(400).json({ success: false, error: 'Year is required' });
+    }
+
+    const imported = {};
+    for (let m = 1; m <= 12; m++) {
+      const monthKey = `${year} ${String(m).padStart(2, '0')}`;
+      try {
+        const data = await getOnlinePamokosMonthData(monthKey);
+        imported[monthKey] = data;
+      } catch (e) {
+        console.error(`[import] Error reading ${monthKey}:`, e.message);
+        imported[monthKey] = { daily: null, leads_daily: null, deals_daily: null };
+      }
+    }
+
+    res.json({ success: true, imported });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

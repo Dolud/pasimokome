@@ -138,14 +138,25 @@
         x-text="saveMessage"></div>
 
       <!-- Year Selector -->
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Metai</label>
-        <select x-model="selectedYear" @change="loadBudgets()"
-          class="w-48 px-3.5 py-2 rounded-lg border border-gray-300 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition bg-white dark:bg-gray-800 dark:text-white">
-          <template x-for="y in years" :key="y">
-            <option :value="y" x-text="y"></option>
-          </template>
-        </select>
+      <div class="mb-4 flex items-end gap-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Metai</label>
+          <select x-model="selectedYear" @change="loadBudgets()"
+            class="w-48 px-3.5 py-2 rounded-lg border border-gray-300 text-sm focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition bg-white dark:bg-gray-800 dark:text-white">
+            <template x-for="y in years" :key="y">
+              <option :value="y" x-text="y"></option>
+            </template>
+          </select>
+        </div>
+        <div>
+          <button @click="importFromSheets()" :disabled="importing"
+            class="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50 flex items-center gap-2">
+            <svg x-show="!importing" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <span x-show="importing" class="w-4 h-4 border-2 border-gray-300 border-t-brand-500 rounded-full animate-spin"></span>
+            <span x-show="!importing">Importuoti iš Google Sheets</span>
+            <span x-show="importing">Importuojama...</span>
+          </button>
+        </div>
       </div>
 
       <!-- Budget Table -->

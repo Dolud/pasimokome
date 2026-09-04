@@ -4,6 +4,7 @@ function budgetApp() {
     saving: false,
     saveMessage: '',
     saveError: false,
+    importing: false,
     months: [],
     years: [],
     selectedYear: new Date().getFullYear(),
@@ -99,6 +100,40 @@ function budgetApp() {
         this.saveError = true;
       }
       this.saving = false;
+    },
+
+    async importFromSheets() {
+      this.importing = true;
+      this.saveMessage = '';
+      this.saveError = false;
+      try {
+        const res = await fetch('/api/online-pamokos/budgets/import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ year: this.selectedYear })
+        });
+        const data = await res.json();
+        if (data.success) {
+          for (const [monthKey, values] of Object.entries(data.imported)) {
+            if (!this.budgets[monthKey]) {
+              this.budgets[monthKey] = {};
+            }
+            if (values.daily !== null) this.budgets[monthKey].daily = values.daily;
+            if (values.leads_daily !== null) this.budgets[monthKey].leads_daily = values.leads_daily;
+            if (values.deals_daily !== null) this.budgets[monthKey].deals_daily = values.deals_daily;
+          }
+          this.saveMessage = 'Duomenys importuoti. Nepamirškite išsaugoti!';
+          this.saveError = false;
+          setTimeout(() => { this.saveMessage = ''; }, 5000);
+        } else {
+          this.saveMessage = data.error || 'Importo klaida';
+          this.saveError = true;
+        }
+      } catch (e) {
+        this.saveMessage = 'Nepavyko importuoti: ' + e.message;
+        this.saveError = true;
+      }
+      this.importing = false;
     },
   };
 }

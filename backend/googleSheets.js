@@ -350,4 +350,48 @@ async function getOnlinePamokosLeadsPlanasAmount(startDate, endDate) {
   }
 }
 
-module.exports = { getSheetValue, getPlanasAmount, getLeadsPlanasAmount, getOnlinePamokosPlanasAmount, getOnlinePamokosLeadsPlanasAmount, getStovyklaDealsCountPlanasAmount, getOnlinePamokosDealsCountPlanasAmount, getStovyklaSumaAmount, getMonthSheetName, getDaysInRange, resetSheetsClient };
+async function getOnlinePamokosMonthData(monthSheetName) {
+  const sheets = await getSheetsClient();
+  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
+
+  const headerRes = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: `'${monthSheetName}'!1:1`,
+  });
+  const headers = headerRes.data.values ? headerRes.data.values[0] : [];
+
+  const normalizedSearch = (h) => h.replace(/\n/g, ' ').trim().toLowerCase();
+  const findCol = (search) => {
+    const s = normalizedSearch(search);
+    for (let i = 0; i < headers.length; i++) {
+      if (normalizedSearch(String(headers[i])).includes(s)) {
+        return colIndexToLetter(i);
+      }
+    }
+    return null;
+  };
+
+  const budgetCol = findCol(ONLINE_PAMOKOS_PLANAS_HEADER);
+  const leadsCol = findCol(ONLINE_PAMOKOS_LEADS_HEADER);
+  const dealsCol = findCol(DEALS_COUNT_HEADER_ONLINE);
+
+  const getVal = async (col) => {
+    if (!col) return null;
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: `'${monthSheetName}'!${col}3`,
+    });
+    const vals = res.data.values;
+    if (!vals || !vals[0] || vals[0][0] === undefined || vals[0][0] === '') return null;
+    const num = parseFloat(String(vals[0][0]).replace(',', '.').replace(/[^\d.-]/g, ''));
+    return isNaN(num) ? null : num;
+  };
+
+  return {
+    daily: await getVal(budgetCol),
+    leads_daily: await getVal(leadsCol),
+    deals_daily: await getVal(dealsCol),
+  };
+}
+
+module.exports = { getSheetValue, getPlanasAmount, getLeadsPlanasAmount, getOnlinePamokosPlanasAmount, getOnlinePamokosLeadsPlanasAmount, getStovyklaDealsCountPlanasAmount, getOnlinePamokosDealsCountPlanasAmount, getStovyklaSumaAmount, getMonthSheetName, getDaysInRange, getOnlinePamokosMonthData, resetSheetsClient };
