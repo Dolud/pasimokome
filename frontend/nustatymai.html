@@ -415,13 +415,16 @@
               <table class="w-full">
                 <thead>
                   <tr class="border-b border-gray-100">
-                    <th class="text-left text-xs font-medium text-gray-500 pb-2">Kampanija</th>
+                    <th class="text-left text-xs font-medium text-gray-500 pb-2"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meta_Platforms_Inc._logo.svg/200px-Meta_Platforms_Inc._logo.svg.png" alt="Meta" class="inline h-3.5 mr-1 -mt-0.5">Kampanija</th>
                     <th class="text-left text-xs font-medium text-gray-500 pb-2 cursor-pointer hover:text-gray-700 select-none" @click="sortCampaigns('createdTime')">
                       Sukurta
                       <svg x-show="campaignSort.field === 'createdTime'" class="inline w-3 h-3 ml-0.5 -mt-0.5" :class="campaignSort.dir === 'asc' ? 'rotate-180' : ''" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
                     </th>
-                    <th class="text-left text-xs font-medium text-gray-500 pb-2">Statusas</th>
-                    <th class="text-left text-xs font-medium text-gray-500 pb-2">Produktas</th>
+                    <th class="text-left text-xs font-medium text-gray-500 pb-2 cursor-pointer hover:text-gray-700 select-none" @click="sortCampaigns('status')">
+                      Statusas
+                      <svg x-show="campaignSort.field === 'status'" class="inline w-3 h-3 ml-0.5 -mt-0.5" :class="campaignSort.dir === 'asc' ? 'rotate-180' : ''" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                    </th>
+                    <th class="text-left text-xs font-medium text-gray-500 pb-2"><img src="https://logo-teka.com/wp-content/uploads/2025/06/bitrix24-logo-eng.png" alt="Bitrix24" class="inline h-3.5 mr-1 -mt-0.5">Produktas</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -436,8 +439,8 @@
                           </span>
                         </template>
                         <template x-if="campaign.status === 'PAUSED'">
-                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700">
-                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>Pristabdyta
+                          <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                            <span class="w-1.5 h-1.5 rounded-full bg-gray-500"></span>Pristabdyta
                           </span>
                         </template>
                         <template x-if="campaign.status !== 'ACTIVE' && campaign.status !== 'PAUSED'">
