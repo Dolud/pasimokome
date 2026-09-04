@@ -346,11 +346,9 @@ function nustatymaiApp() {
       const entry = this.budgets[monthKey];
       if (!entry) return '';
       const daily = parseFloat(entry.daily) || 0;
-      const leads = parseFloat(entry.leads_daily) || 0;
       const deals = parseFloat(entry.deals_daily) || 0;
-      if (deals === 0 || leads === 0) return '';
-      const conversion = (deals / leads) * 100;
-      return ((daily / deals) * (100 / conversion)).toFixed(2);
+      if (deals === 0) return '';
+      return (daily / deals).toFixed(2);
     },
 
     async loadBudgets() {
