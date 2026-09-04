@@ -1102,7 +1102,12 @@ app.get('/api/campaigns/scan', async (req, res) => {
 });
 
 app.get('/api/campaigns', (req, res) => {
-  res.json({ success: true, mappings: getAllMappings() });
+  const raw = getAllMappings();
+  const mappings = {};
+  for (const [name, val] of Object.entries(raw)) {
+    mappings[name] = typeof val === 'object' && val !== null ? val.category : val;
+  }
+  res.json({ success: true, mappings });
 });
 
 app.post('/api/campaigns', (req, res) => {
