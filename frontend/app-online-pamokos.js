@@ -153,6 +153,7 @@ async function loadDashboard() {
 
     loadPlanas(dates.startDate, dates.endDate);
     loadLeadsPlanas(dates.startDate, dates.endDate);
+    loadLeadsPrice(dates.startDate, dates.endDate);
 
   } catch (error) {
     showError('errorContainer', `Error: ${error.message}`);
@@ -275,6 +276,21 @@ async function loadLeadsPlanas(startDate, endDate) {
     document.getElementById('statLeadsPlanas').textContent = '-';
   }
   updateLeadsProgressBar();
+}
+
+async function loadLeadsPrice(startDate, endDate) {
+  try {
+    const response = await fetch(`${API_BASE}/api/online-pamokos/leads-price?startDate=${startDate}&endDate=${endDate}`);
+    const data = await response.json();
+    if (data.success && data.leadsPrice !== null) {
+      document.getElementById('statCPLPlanas').textContent = formatCurrency(data.leadsPrice);
+    } else {
+      document.getElementById('statCPLPlanas').textContent = '-';
+    }
+  } catch (error) {
+    document.getElementById('statCPLPlanas').textContent = '-';
+  }
+  updateCPLProgressBar();
 }
 
 async function loadDebugData() {

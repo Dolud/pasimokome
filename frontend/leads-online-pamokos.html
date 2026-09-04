@@ -301,7 +301,16 @@
             <div class="mt-5 flex items-end justify-between">
               <div>
                 <span class="text-sm text-gray-500 dark:text-gray-400">Vidutinė užklausos kaina</span>
-                <h4 id="statCPL" class="mt-2 text-[30px] font-bold text-gray-800 dark:text-white/90">-</h4>
+                <div class="mt-2 flex items-baseline gap-1.5">
+                  <h4 id="statCPL" class="text-[30px] font-bold text-gray-800 dark:text-white/90">-</h4>
+                  <span class="text-lg font-medium text-gray-400 dark:text-gray-500">/</span>
+                  <h4 id="statCPLPlanas" class="text-lg font-bold text-brand-500">-</h4>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4">
+              <div class="relative w-full h-2 rounded-full bg-gray-200 dark:bg-gray-800">
+                <div id="cplProgressBar" class="absolute left-0 h-full rounded-full transition-all duration-500" style="width:0%; background-color:#8B5CF6;"></div>
               </div>
             </div>
           </div>

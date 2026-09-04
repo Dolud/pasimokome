@@ -1040,6 +1040,27 @@ app.get('/api/online-pamokos/leads-planas', (req, res) => {
   }
 });
 
+app.get('/api/online-pamokos/leads-price', (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    if (!startDate || !endDate) {
+      return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
+    }
+
+    const daily = getLocalOnlinePamokosValue(startDate, endDate, 'daily');
+    const leadsDaily = getLocalOnlinePamokosValue(startDate, endDate, 'leads_daily');
+    
+    if (daily === null || leadsDaily === null || leadsDaily === 0) {
+      return res.json({ success: true, leadsPrice: null });
+    }
+
+    const leadsPrice = daily / leadsDaily;
+    res.json({ success: true, leadsPrice });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/api/online-pamokos/budgets', (req, res) => {
   res.json({ success: true, budgets: getBudgets() });
 });

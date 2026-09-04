@@ -100,6 +100,26 @@ function updateLeadsProgressBar() {
   bar.style.backgroundColor = leadsGradientColor(percent);
 }
 
+function updateCPLProgressBar() {
+  const bar = document.getElementById('cplProgressBar');
+  const cplEl = document.getElementById('statCPL');
+  const planasEl = document.getElementById('statCPLPlanas');
+  if (!bar || !cplEl || !planasEl) return;
+
+  const cpl = parseEuroAmount(cplEl.textContent);
+  const planas = parseEuroAmount(planasEl.textContent);
+  
+  if (planas <= 0 || cpl <= 0) {
+    bar.style.width = '0%';
+    return;
+  }
+
+  // Lower is better for cost, so we invert the progress
+  const percent = Math.min((planas / cpl) * 100, 100);
+  bar.style.width = percent + '%';
+  bar.style.backgroundColor = spendGradientColor(percent);
+}
+
 function updateDealsProgressBar() {
   const bar = document.getElementById('dealsProgressBar');
   const dealsEl = document.getElementById('statKiekis');
