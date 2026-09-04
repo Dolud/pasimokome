@@ -189,7 +189,8 @@ function settingsApp() {
           this.newPassword = '';
           setTimeout(() => {
             this.saveMessage = '';
-          }, 5000);
+            this.loadProducts();
+          }, 3000);
         } else {
           this.saveMessage = res.error || 'Klaida saugant';
           this.saveError = true;
