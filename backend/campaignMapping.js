@@ -25,7 +25,10 @@ function saveMapping(data) {
 function getCampaignsForProduct(product) {
   const mapping = loadMapping();
   return Object.entries(mapping.campaigns)
-    .filter(([_, cat]) => cat === product)
+    .filter(([_, cat]) => {
+      const val = typeof cat === 'object' && cat !== null ? cat.category : cat;
+      return val === product;
+    })
     .map(([name]) => name);
 }
 

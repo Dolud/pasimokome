@@ -1573,6 +1573,22 @@ app.get('/api/debug/sheets', async (req, res) => {
   }
 });
 
+app.get('/api/debug/source-mappings', (req, res) => {
+  const testCampaigns = [
+    'Online pamokos (lead generation)',
+    'Online pamokos',
+    'Vasaros Akcija (lead generation)',
+    'Korepetitoriai (lead generation)',
+    'Stovykla (lead generation)'
+  ];
+  const results = testCampaigns.map(name => ({
+    campaign: name,
+    normalized: normalizeSource(name),
+    allowedSources: getAllowedSources(name)
+  }));
+  res.json({ results });
+});
+
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled rejection:', err.message);
 });
