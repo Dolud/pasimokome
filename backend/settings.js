@@ -183,6 +183,7 @@ async function testGoogleSheets() {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
   if (!clientId || !clientSecret || !refreshToken) {
     return { ok: false, error: 'Nesukonfigūruota' };
   }
@@ -190,7 +191,14 @@ async function testGoogleSheets() {
     const { google } = require('googleapis');
     const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
     oauth2Client.setCredentials({ refresh_token: refreshToken });
-    await oauth2Client.getAccessToken();
+    const sheets = google.sheets({ version: 'v4', auth: oauth2Client });
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "'2026 09'!1:1",
+    });
+    if (!response.data.values || response.data.values.length === 0) {
+      return { ok: false, error: 'Lentelė tuščia' };
+    }
     return { ok: true };
   } catch (e) {
     return { ok: false, error: e.message };
