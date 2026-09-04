@@ -1084,13 +1084,12 @@ app.post('/api/online-pamokos/budgets/import', async (req, res) => {
 
 app.get('/api/campaigns/scan', async (req, res) => {
   try {
-    const { getNormalizedCampaigns: getMetaCampaigns } = require('./meta');
-    const allCampaigns = await getMetaCampaigns('2025-01-01', new Date().toISOString().split('T')[0]);
+    const { getAllCampaigns } = require('./meta');
+    const allCampaigns = await getAllCampaigns();
     const mapping = getAllMappings();
     const result = allCampaigns.map(c => ({
       name: c.campaignName,
       category: mapping[c.campaignName] || autoDetectCategory(c.campaignName),
-      spend: c.spend,
     }));
     res.json({ success: true, campaigns: result });
   } catch (error) {

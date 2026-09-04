@@ -77,6 +77,19 @@ async function paginate(path, params = {}) {
   return rows;
 }
 
+async function getAllCampaigns() {
+  const adAccountId = getAdAccountId();
+  const rows = await paginate(`${adAccountId}/campaigns`, {
+    fields: 'name,id,status',
+    limit: '100'
+  });
+  return rows.filter(c => c.status !== 'ARCHIVED').map(c => ({
+    campaignId: c.id,
+    campaignName: c.name,
+    status: c.status,
+  }));
+}
+
 async function pageRequest(path, params = {}) {
   const pageAccessToken = getPageAccessToken();
   if (!pageAccessToken) {
@@ -482,4 +495,4 @@ async function prewarmAdImages(startDate, endDate, targetCampaigns = null) {
   return adIds.length;
 }
 
-module.exports = { getNormalizedCampaigns, getDailyCampaignData, getLeads, getAdsByCampaign, getAdLevelInsights, prewarmAdImages, normalizeCampaignName, getStovyklaCampaigns, getOnlinePamokosCampaigns };
+module.exports = { getNormalizedCampaigns, getDailyCampaignData, getLeads, getAdsByCampaign, getAdLevelInsights, prewarmAdImages, normalizeCampaignName, getStovyklaCampaigns, getOnlinePamokosCampaigns, getAllCampaigns };
