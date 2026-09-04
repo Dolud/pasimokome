@@ -18,6 +18,10 @@ function settingsApp() {
     saveMessage: '',
     saveError: false,
 
+    campaigns: [],
+    scanningCampaigns: false,
+    savingCampaigns: false,
+
     get allOk() {
       if (!this.testResults) return false;
       return Object.values(this.testResults).every(r => r.ok);
@@ -47,6 +51,7 @@ function settingsApp() {
             this.authenticated = true;
             this.settings = res.settings;
             this.initShowFields();
+            this.loadExistingCampaigns();
           } else {
             this.token = null;
             localStorage.removeItem('settings_token');
@@ -66,6 +71,17 @@ function settingsApp() {
           }
         }
       }
+    },
+
+    async loadExistingCampaigns() {
+      try {
+        const res = await this.api('GET', '/api/campaigns');
+        if (res.success && res.mappings) {
+          this.campaigns = Object.entries(res.mappings).map(([name, category]) => ({
+            name, category
+          }));
+        }
+      } catch (e) {}
     },
 
     async login() {
@@ -172,6 +188,34 @@ function settingsApp() {
         this.saveError = true;
       }
       this.saving = false;
+    },
+
+    async scanCampaigns() {
+      this.scanningCampaigns = true;
+      try {
+        const res = await this.api('GET', '/api/campaigns/scan');
+        if (res.success) {
+          this.campaigns = res.campaigns;
+        }
+      } catch (e) {}
+      this.scanningCampaigns = false;
+    },
+
+    async saveCampaigns() {
+      this.savingCampaigns = true;
+      try {
+        const payload = {};
+        for (const c of this.campaigns) {
+          payload[c.name] = c.category;
+        }
+        const res = await this.api('POST', '/api/campaigns', { campaigns: payload });
+        if (res.success) {
+          this.saveMessage = 'Kampanijos išsaugotos!';
+          this.saveError = false;
+          setTimeout(() => { this.saveMessage = ''; }, 3000);
+        }
+      } catch (e) {}
+      this.savingCampaigns = false;
     },
 
     async api(method, url, body) {

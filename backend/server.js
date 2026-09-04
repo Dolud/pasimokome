@@ -8,7 +8,7 @@ const cors = require('cors');
 const { google } = require('googleapis');
 
 const { getProfile, getLeadFields, getStatusList, getSourceStatusMap, getAllLeads, bitrixRequest, getContactSourceStatusMap, getContactsByIds } = require('./bitrix');
-const { getNormalizedCampaigns, getDailyCampaignData, getLeads, getAdLevelInsights, prewarmAdImages, normalizeCampaignName, ONLINE_PAMOKOS_CAMPAIGNS } = require('./meta');
+const { getNormalizedCampaigns, getDailyCampaignData, getLeads, getAdLevelInsights, prewarmAdImages, normalizeCampaignName, getStovyklaCampaigns, getOnlinePamokosCampaigns } = require('./meta');
 const { getNormalizedCampaigns: getGoogleAdsCampaigns, getDailyCampaignData: getGoogleAdsDailyCampaignData, normalizeGoogleAdsCampaign, resetOAuth2Client } = require('./googleAds');
 const { buildDashboard, buildGoogleAdsRows } = require('./dashboard');
 const { matchSource, getAllowedSources } = require('./sourceMatcher');
@@ -16,6 +16,7 @@ const { calculateSpendWithVAT, calculateCPL } = require('./calculations');
 const { getPlanasAmount, getLeadsPlanasAmount, getOnlinePamokosPlanasAmount, getOnlinePamokosLeadsPlanasAmount, getStovyklaDealsCountPlanasAmount, getOnlinePamokosDealsCountPlanasAmount, getStovyklaSumaAmount, getMonthSheetName, getDaysInRange, getOnlinePamokosMonthData, resetSheetsClient } = require('./googleSheets');
 const { worker: adImageWorker } = require('./adImageWorker');
 const { getBudgetField, getBudgets, saveBudgets } = require('./onlinePamokosBudgets');
+const { loadMapping, saveMapping, autoDetectCategory, getAllMappings } = require('./campaignMapping');
 
 const app = express();
 app.set('trust proxy', true);
@@ -777,7 +778,7 @@ app.get('/api/online-pamokos/dashboard', async (req, res) => {
     };
 
     const [metaCampaigns, googleAdsCampaigns, bitrixLeads, sourceStatusMap] = await Promise.all([
-      getNormalizedCampaigns(startDate, endDate, ONLINE_PAMOKOS_CAMPAIGNS),
+      getNormalizedCampaigns(startDate, endDate, getOnlinePamokosCampaigns()),
       getGoogleAdsCampaigns(startDate, endDate).catch(() => []),
       getAllLeads(bitrixFilter),
       getSourceStatusMap()
@@ -818,7 +819,7 @@ app.get('/api/online-pamokos/deals', async (req, res) => {
     };
 
     const [metaCampaigns, googleAdsCampaigns, deals, dealSourceMap, contactSourceMap] = await Promise.all([
-      getNormalizedCampaigns(startDate, endDate, ONLINE_PAMOKOS_CAMPAIGNS),
+      getNormalizedCampaigns(startDate, endDate, getOnlinePamokosCampaigns()),
       getGoogleAdsCampaigns(startDate, endDate).catch(() => []),
       getAllDeals(dealFilter, DEAL_SELECT_FIELDS),
       getDealSourceStatusMap(),
@@ -1076,6 +1077,39 @@ app.post('/api/online-pamokos/budgets/import', async (req, res) => {
     }
 
     res.json({ success: true, imported });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/campaigns/scan', async (req, res) => {
+  try {
+    const { getNormalizedCampaigns: getMetaCampaigns } = require('./meta');
+    const allCampaigns = await getMetaCampaigns('2025-01-01', new Date().toISOString().split('T')[0]);
+    const mapping = getAllMappings();
+    const result = allCampaigns.map(c => ({
+      name: c.campaignName,
+      category: mapping[c.campaignName] || autoDetectCategory(c.campaignName),
+      spend: c.spend,
+    }));
+    res.json({ success: true, campaigns: result });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/campaigns', (req, res) => {
+  res.json({ success: true, mappings: getAllMappings() });
+});
+
+app.post('/api/campaigns', (req, res) => {
+  try {
+    const { campaigns } = req.body;
+    if (!campaigns || typeof campaigns !== 'object') {
+      return res.status(400).json({ success: false, error: 'Invalid data' });
+    }
+    saveMapping({ campaigns });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

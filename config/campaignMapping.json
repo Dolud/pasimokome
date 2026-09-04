@@ -1,0 +1,12 @@
+{
+  "campaigns": {
+    "Profesijų pasaulis (lead generation)": "stovykla",
+    "Gyvūnų pasaulis(lead generation)": "stovykla",
+    "Kūryba ir mokslas (lead generation)": "stovykla",
+    "Stovykla (lead generation)": "stovykla",
+    "Online pamokos (lead generation)": "online_pamokos",
+    "Korepetitoriai (lead generation)": "online_pamokos",
+    "Online pamokos": "online_pamokos",
+    "Vasaros Akcija (lead generation)": "online_pamokos"
+  }
+}

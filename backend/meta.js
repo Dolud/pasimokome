@@ -2,24 +2,14 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config({ path: path.join(__dirname, '../config/.env') });
 const { worker: adImageWorker, CACHE_DIR } = require('./adImageWorker');
+const { getCampaignsForProduct } = require('./campaignMapping');
 
 function getAccessToken() { return process.env.META_ACCESS_TOKEN; }
 function getPageAccessToken() { return process.env.META_PAGE_ACCESS_TOKEN; }
 function getAdAccountId() { return process.env.META_AD_ACCOUNT_ID; }
 
-const STOVYKLA_CAMPAIGNS = [
-  'Profesijų pasaulis (lead generation)',
-  'Gyvūnų pasaulis(lead generation)',
-  'Kūryba ir mokslas (lead generation)',
-  'Stovykla (lead generation)'
-];
-
-const ONLINE_PAMOKOS_CAMPAIGNS = [
-  'Online pamokos (lead generation)',
-  'Korepetitoriai (lead generation)',
-  'Online pamokos',
-  'Vasaros Akcija (lead generation)'
-];
+function getStovyklaCampaigns() { return getCampaignsForProduct('stovykla'); }
+function getOnlinePamokosCampaigns() { return getCampaignsForProduct('online_pamokos'); }
 
 async function metaRequest(endpoint, params = {}) {
   const accessToken = getAccessToken();
@@ -153,7 +143,7 @@ function normalizeCampaignName(name) {
 
 async function getNormalizedCampaigns(startDate, endDate, targetCampaigns = null) {
   const insights = await getCampaignData(startDate, endDate);
-  const filter = targetCampaigns || STOVYKLA_CAMPAIGNS;
+  const filter = targetCampaigns || getStovyklaCampaigns();
 
   return insights
     .filter(c => filter.includes(c.campaign_name))
@@ -199,7 +189,7 @@ async function getDailyCampaignData(startDate, endDate, targetCampaigns = null) 
     nextUrl = pageData.paging && pageData.paging.next;
   }
 
-  const filter = targetCampaigns || STOVYKLA_CAMPAIGNS;
+  const filter = targetCampaigns || getStovyklaCampaigns();
 
   return rows
     .filter(r => filter.includes(r.campaign_name))
@@ -233,7 +223,7 @@ async function getAdLevelInsights(startDate, endDate, targetCampaigns = null) {
     nextUrl = pageData.paging && pageData.paging.next;
   }
 
-  const filter = targetCampaigns || [...STOVYKLA_CAMPAIGNS, ...ONLINE_PAMOKOS_CAMPAIGNS];
+  const filter = targetCampaigns || [...getStovyklaCampaigns(), ...getOnlinePamokosCampaigns()];
   const adsByCampaign = await getAdsByCampaign(targetCampaigns);
 
   const cacheThumb = (adId) => {
@@ -278,7 +268,7 @@ async function getAdLevelInsights(startDate, endDate, targetCampaigns = null) {
 }
 
 async function getAdsByCampaign(targetCampaigns = null) {
-  const filter = targetCampaigns || [...STOVYKLA_CAMPAIGNS, ...ONLINE_PAMOKOS_CAMPAIGNS];
+  const filter = targetCampaigns || [...getStovyklaCampaigns(), ...getOnlinePamokosCampaigns()];
   const campaigns = await getCampaignData('2025-01-01', new Date().toISOString().slice(0, 10));
   const adsByCampaign = {};
 
@@ -458,7 +448,7 @@ async function getLeads(startDate, endDate, targetCampaigns = null) {
 }
 
 async function prewarmAdImages(startDate, endDate, targetCampaigns = null) {
-  const filter = targetCampaigns || [...STOVYKLA_CAMPAIGNS, ...ONLINE_PAMOKOS_CAMPAIGNS];
+  const filter = targetCampaigns || [...getStovyklaCampaigns(), ...getOnlinePamokosCampaigns()];
   const params = {
     'time_range[since]': startDate,
     'time_range[until]': endDate,
@@ -492,4 +482,4 @@ async function prewarmAdImages(startDate, endDate, targetCampaigns = null) {
   return adIds.length;
 }
 
-module.exports = { getNormalizedCampaigns, getDailyCampaignData, getLeads, getAdsByCampaign, getAdLevelInsights, prewarmAdImages, normalizeCampaignName, STOVYKLA_CAMPAIGNS, ONLINE_PAMOKOS_CAMPAIGNS };
+module.exports = { getNormalizedCampaigns, getDailyCampaignData, getLeads, getAdsByCampaign, getAdLevelInsights, prewarmAdImages, normalizeCampaignName, getStovyklaCampaigns, getOnlinePamokosCampaigns };
