@@ -331,6 +331,7 @@ function nustatymaiApp() {
         this.budgets[monthKey] = {};
       }
       this.budgets[monthKey][field] = value;
+      this.budgets = { ...this.budgets };
     },
 
     getConversion(monthKey) {
