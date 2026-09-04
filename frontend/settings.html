@@ -6,16 +6,16 @@
   <title>Nustatymai - Marketing Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
-          fontFamily: { outfit: ['Outfit', 'sans-serif'] },
+          fontFamily: { outfit: ['Inter', 'sans-serif'] },
           colors: {
-            brand: { 50:'#ecf3ff',100:'#dde9ff',200:'#c2d6ff',300:'#9cb9ff',400:'#7592ff',500:'#465fff',600:'#3641f5',700:'#2a31d8',800:'#252dae',900:'#262e89' },
+            brand: { 50:'#ecf3ff',100:'#dde9ff',200:'#c2d6ff',300:'#9cb9ff',400:'#7592ff',500:'#e15159',600:'#e15159',700:'#2a31d8',800:'#252dae',900:'#262e89' },
             success: { 50:'#f0fdf4',500:'#22c55e',600:'#16a34a' },
             error: { 50:'#fef2f2',500:'#ef4444',600:'#dc2626' },
           },
@@ -24,10 +24,10 @@
     }
   </script>
   <style>
-    body { font-family: 'Outfit', sans-serif; }
+    body { font-family: 'Inter', sans-serif; }
   </style>
 </head>
-<body class="bg-gray-50 font-outfit min-h-screen" x-data="settingsApp()" x-init="await init()">
+<body class="font-outfit min-h-screen" style="background-color: #f3efee;" x-data="settingsApp()" x-init="await init()">
 
   <!-- Login Screen -->
   <div x-show="!authenticated" class="min-h-screen flex items-center justify-center p-4">
@@ -128,7 +128,7 @@
                 Autorizuoti
               </a>
               <button @click="testGroup(groupKey)" :disabled="testingGroup === groupKey"
-                class="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-100 transition disabled:opacity-50">
+                class="text-xs px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 hover:bg-white/80 transition disabled:opacity-50">
                 <span x-show="testingGroup !== groupKey">Patikrinti</span>
                 <span x-show="testingGroup === groupKey">Tikrinama...</span>
               </button>

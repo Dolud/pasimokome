@@ -6,7 +6,7 @@
   <title>Pasimokome.lt - Marketing Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
   <link href="https://cdn.datatables.net/1.13.6/css/dataTables.dataTables.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
@@ -16,7 +16,7 @@
       theme: {
         extend: {
           fontFamily: {
-            outfit: ['Outfit', 'sans-serif'],
+            outfit: ['Inter', 'sans-serif'],
           },
           colors: {
             brand: {
@@ -25,8 +25,8 @@
               200: '#c2d6ff',
               300: '#9cb9ff',
               400: '#7592ff',
-              500: '#465fff',
-              600: '#3641f5',
+              500: '#e15159',
+              600: '#e15159',
               700: '#2a31d8',
               800: '#252dae',
               900: '#262e89',
@@ -55,12 +55,12 @@
     [x-cloak] { display: none !important; }
   </style>
 </head>
-<body class="font-outfit bg-gray-50">
+<body class="font-outfit" style="background-color: #f3efee;">
 
   <!-- SIDEBAR -->
   <aside
     :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-    class="sidebar fixed left-0 top-0 z-50 flex h-screen w-[290px] flex-col overflow-y-auto border-r border-gray-200 bg-white px-5 transition-all duration-300 dark:border-gray-800 dark:bg-gray-900"
+    class="sidebar fixed left-0 top-0 z-50 flex h-screen w-[290px] flex-col overflow-y-auto px-5 transition-all duration-300"
     x-data="{ stovyklaOpen: true, onlinePamokosOpen: false }"
   >
     <!-- Sidebar Header -->
@@ -84,7 +84,7 @@
               <a
                 href="#"
                 @click.prevent="stovyklaOpen = !stovyklaOpen"
-                class="menu-item group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
+                class="menu-item group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-white/80 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200"
               >
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
@@ -96,12 +96,12 @@
               </a>
               <ul x-show="stovyklaOpen" x-collapse class="mt-1 flex flex-col gap-1 pl-9">
                 <li>
-                  <a href="/" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400">
+                  <a href="/" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium bg-white/80 text-brand-600 dark:bg-white/10 dark:text-brand-400">
                     Leads Stovykla
                   </a>
                 </li>
                 <li>
-                  <a href="/deals" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200">
+                  <a href="/deals" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white/80 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200">
                     Deals Stovykla
                   </a>
                 </li>
@@ -112,7 +112,7 @@
               <a
                 href="#"
                 @click.prevent="onlinePamokosOpen = !onlinePamokosOpen"
-                class="menu-item group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
+                class="menu-item group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-white/80 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200"
               >
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
@@ -124,17 +124,17 @@
               </a>
               <ul x-show="onlinePamokosOpen" x-collapse class="mt-1 flex flex-col gap-1 pl-9">
                 <li>
-                  <a href="/online-pamokos" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200">
+                  <a href="/online-pamokos" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white/80 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200">
                     Leads
                   </a>
                 </li>
                 <li>
-                  <a href="/online-pamokos/deals" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200">
+                  <a href="/online-pamokos/deals" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white/80 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200">
                     Deals
                   </a>
                 </li>
                 <li>
-                  <a href="/online-pamokos/nustatymai" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200">
+                  <a href="/online-pamokos/nustatymai" class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-white/80 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200">
                     Nustatymai
                   </a>
                 </li>
@@ -142,7 +142,7 @@
             </li>
             <!-- Meta Reklamos -->
             <li>
-              <a href="/meta" class="menu-item group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200">
+              <a href="/meta" class="menu-item group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-white/80 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200">
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
                 </svg>
@@ -154,7 +154,7 @@
               <a
                 href="#"
                 @click.prevent="document.getElementById('dashboard-section').style.display='none'; document.getElementById('debug-section').style.display='block';"
-                class="menu-item group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-200"
+                class="menu-item group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-white/80 hover:text-gray-800 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-gray-200"
               >
                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
@@ -172,7 +172,7 @@
   <!-- MAIN CONTENT -->
   <div class="main-content-wrapper min-h-screen">
     <!-- Header -->
-    <header class="sticky top-0 z-40 flex w-full border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+    <header class="sticky top-0 z-40 flex w-full border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 lg:hidden">
       <div class="flex grow items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <!-- Mobile menu button -->
         <button
@@ -184,17 +184,12 @@
           </svg>
         </button>
 
-        <!-- Page title -->
-        <div class="hidden lg:block">
-          <h1 class="text-lg font-semibold text-gray-800 dark:text-white">Marketing Analytics Dashboard</h1>
-        </div>
-
         <!-- Right side -->
         <div class="flex items-center gap-3">
           <!-- Dark mode toggle -->
           <button
             @click="darkMode = !darkMode"
-            class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-gray-100 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800"
+            class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-white/80 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800"
           >
             <svg x-show="!darkMode" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
@@ -211,14 +206,19 @@
     <div class="p-4 sm:p-6 lg:p-8">
 
       <!-- Dashboard Section -->
-      <div id="dashboard-section">
-        <!-- Date Picker -->
+      <div id="dashboard-section" style="background: #ffffff66; padding: 30px; border-radius: 20px;">
+        <!-- Header Row -->
         <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <!-- Page Title -->
+          <div>
+            <h1 class="text-lg font-semibold text-gray-800 dark:text-white">Marketing Analytics Dashboard</h1>
+          </div>
+          <!-- Date Picker -->
           <div class="relative">
             <input
               type="text"
               id="dateRange"
-              class="datepicker w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-11 pr-4 text-theme-sm font-medium text-gray-700 shadow-theme-xs focus:outline-hidden focus:ring-0 focus-visible:outline-hidden dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
+              class="datepicker w-full rounded-lg bg-white py-2.5 pl-11 pr-4 text-theme-sm font-medium text-gray-700 shadow-theme-xs focus:outline-hidden focus-visible:outline-hidden dark:bg-gray-800 dark:text-gray-400"
               placeholder="Select dates"
               readonly="readonly"
               data-class="flatpickr-right"
@@ -248,7 +248,7 @@
         <!-- Stats Grid -->
         <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 md:gap-6">
           <!-- Total Spend -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+          <div class="rounded-2xl bg-white p-5 md:p-6">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl" style="background-color:#f6f6f7;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#564e4e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="m16 19 3 3 3-3"/><path d="M18 12h.01"/><path d="M19 16v6"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>
             </div>
@@ -270,7 +270,7 @@
           </div>
 
           <!-- Converted Leads -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+          <div class="rounded-2xl bg-white p-5 md:p-6">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl" style="background-color:#f6f6f7;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#564e4e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.051 12.616a1 1 0 0 1 1.909.024l.737 1.452a1 1 0 0 0 .737.535l1.634.256a1 1 0 0 1 .588 1.806l-1.172 1.168a1 1 0 0 0-.282.866l.259 1.613a1 1 0 0 1-1.541 1.134l-1.465-.75a1 1 0 0 0-.912 0l-1.465.75a1 1 0 0 1-1.539-1.133l.258-1.613a1 1 0 0 0-.282-.866l-1.156-1.153a1 1 0 0 1 .572-1.822l1.633-.256a1 1 0 0 0 .737-.535z"/><path d="M8 15H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/></svg>
             </div>
@@ -292,7 +292,7 @@
           </div>
 
           <!-- Average CPL -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+          <div class="rounded-2xl bg-white p-5 md:p-6">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl" style="background-color:#f6f6f7;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#564e4e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/></svg>
             </div>
@@ -305,7 +305,7 @@
           </div>
 
           <!-- Active Campaigns -->
-          <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+          <div class="rounded-2xl bg-white p-5 md:p-6">
             <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-light-50 dark:bg-blue-light-500/10">
               <svg class="h-6 w-6 text-blue-light-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
@@ -323,7 +323,7 @@
         <!-- Tables Row -->
         <div class="grid grid-cols-1 gap-6 xl:grid-cols-5">
           <!-- Bitrix Leads Table -->
-          <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03] xl:col-span-2">
+          <div class="overflow-hidden rounded-2xl bg-white pt-4 xl:col-span-2">
             <div class="mb-4 flex flex-col gap-5 px-6 sm:flex-row sm:items-center sm:justify-between">
               <div class="flex items-center gap-2">
                 <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Bitrix Leads</h3>
@@ -353,7 +353,7 @@
           </div>
 
           <!-- Marketing Statistics Table -->
-          <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white pt-4 dark:border-gray-800 dark:bg-white/[0.03] xl:col-span-3">
+          <div class="overflow-hidden rounded-2xl bg-white pt-4 xl:col-span-3">
             <div class="mb-4 flex flex-col gap-5 px-6 sm:flex-row sm:items-center sm:justify-between">
               <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Marketingo statistika</h3>
               <div class="relative">

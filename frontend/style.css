@@ -1,5 +1,12 @@
 /* Custom styles not covered by Tailwind */
 
+/* Global focus styles */
+input:focus, select:focus, textarea:focus, .datepicker:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(225, 81, 89, 0.2) !important;
+  border-color: #e15159 !important;
+}
+
 /* Main content offset for sidebar */
 @media (min-width: 1024px) {
   .main-content-wrapper {
@@ -31,7 +38,7 @@
   width: 48px;
   height: 48px;
   border: 4px solid #e2e8f0;
-  border-top-color: #465fff;
+  border-top-color: #e15159;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -82,7 +89,7 @@
 }
 
 .dataTables_wrapper .dataTables_length select:focus {
-  border-color: #465fff;
+  border-color: #e15159;
   box-shadow: 0 0 0 3px rgba(70, 95, 255, 0.1);
 }
 
@@ -149,20 +156,20 @@ table.dataTable thead th {
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #465fff;
+  background: #e15159;
   color: #ffffff !important;
   border: none;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-  background: #465fff;
+  background: #e15159;
   color: #ffffff !important;
   border: none;
   font-weight: 500;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-  background: #3641f5;
+  background: #e15159;
   color: #ffffff !important;
 }
 
@@ -184,7 +191,7 @@ table.dataTable thead th {
 }
 
 .dark .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-  background: #465fff;
+  background: #e15159;
   color: #ffffff !important;
 }
 
@@ -245,28 +252,29 @@ table.dataTable thead th {
 /* Flatpickr styles from TailAdmin */
 .flatpickr-wrapper {
   width: 100%;
+  min-width: 250px;
 }
 
 .datepicker {
   font-size: 14px;
-  min-width: 240px;
   white-space: nowrap;
+  border: none !important;
 }
 .flatpickr-calendar {
   margin-top: 0.5rem;
   border-radius: 0.75rem;
   padding: 1.25rem;
   color: #667085;
-  border: 1px solid #e4e7ec;
+  border: none;
   box-shadow: 0px 12px 16px -4px rgba(16, 24, 40, 0.08), 0px 4px 6px -2px rgba(16, 24, 40, 0.03);
   width: auto;
   min-width: 320px;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .flatpickr-months .flatpickr-prev-month:hover svg,
 .flatpickr-months .flatpickr-next-month:hover svg {
-  stroke: #465fff;
+  stroke: #e15159;
 }
 .flatpickr-calendar.arrowTop:before,
 .flatpickr-calendar.arrowTop:after {
@@ -369,13 +377,13 @@ span.flatpickr-weekday,
 .flatpickr-day.selected.nextMonthDay,
 .flatpickr-day.startRange.nextMonthDay,
 .flatpickr-day.endRange.nextMonthDay {
-  background: #465fff;
-  border-color: #465fff;
+  background: #e15159;
+  border-color: #e15159;
 }
 .flatpickr-day.selected.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.startRange.startRange + .endRange:not(:nth-child(7n + 1)),
 .flatpickr-day.endRange.startRange + .endRange:not(:nth-child(7n + 1)) {
-  box-shadow: -10px 0 0 #465fff;
+  box-shadow: -10px 0 0 #e15159;
 }
 
 .flatpickr-months .flatpickr-prev-month svg,

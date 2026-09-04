@@ -246,9 +246,9 @@ function renderDailyChart(data) {
       { name: 'Išleista marketingui', data: data.spend }
     ],
     legend: { show: false },
-    colors: ['#465FFF', '#9CB9FF'],
+    colors: ['#e15159', '#9CB9FF'],
     chart: {
-      fontFamily: 'Outfit, sans-serif',
+      fontFamily: 'Inter, sans-serif',
       height: 310,
       type: 'area',
       toolbar: { show: false }
