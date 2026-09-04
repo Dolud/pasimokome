@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const MAPPING_PATH = path.join(__dirname, '../config/campaignMapping.json');
+const DATA_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, '../config');
+const MAPPING_PATH = path.join(DATA_DIR, 'campaignMapping.json');
 
 function loadMapping() {
   try {

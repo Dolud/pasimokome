@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const BUDGETS_PATH = path.join(__dirname, '../config/online-pamokos-budgets.json');
+const DATA_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, '../config');
+const BUDGETS_PATH = path.join(DATA_DIR, 'online-pamokos-budgets.json');
 
 function loadBudgets() {
   try {

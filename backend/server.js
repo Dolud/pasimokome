@@ -1,7 +1,8 @@
 const path = require('path');
 const { loadSettings } = require('./settings');
 loadSettings();
-require('dotenv').config({ path: path.join(__dirname, '../config/.env') });
+const configDir = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, '../config');
+require('dotenv').config({ path: path.join(configDir, '.env') });
 
 const express = require('express');
 const cors = require('cors');
