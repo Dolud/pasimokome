@@ -23,7 +23,6 @@ function nustatymaiApp() {
     products: [],
     scanningCampaigns: false,
     savingCampaigns: false,
-    adAccountId: '',
     campaignSort: { field: 'createdTime', dir: 'desc' },
 
     budgets: {},
@@ -95,8 +94,12 @@ function nustatymaiApp() {
       try {
         const res = await this.api('GET', '/api/campaigns');
         if (res.success && res.mappings) {
-          this.campaigns = Object.entries(res.mappings).map(([name, category]) => ({
-            name, category, id: null, status: null, createdTime: null
+          this.campaigns = Object.entries(res.mappings).map(([name, val]) => ({
+            name,
+            category: val.category || val,
+            id: val.id || null,
+            status: val.status || null,
+            createdTime: val.createdTime || null,
           }));
         }
       } catch (e) {}
@@ -230,7 +233,6 @@ function nustatymaiApp() {
         const res = await this.api('GET', '/api/campaigns/scan');
         if (res.success) {
           this.campaigns = res.campaigns;
-          this.adAccountId = res.adAccountId || '';
         }
       } catch (e) {}
       this.scanningCampaigns = false;
@@ -241,7 +243,7 @@ function nustatymaiApp() {
       try {
         const payload = {};
         for (const c of this.campaigns) {
-          payload[c.name] = c.category;
+          payload[c.name] = { category: c.category, id: c.id, status: c.status, createdTime: c.createdTime };
         }
         const res = await this.api('POST', '/api/campaigns', { campaigns: payload });
         if (res.success) {
@@ -279,12 +281,6 @@ function nustatymaiApp() {
         return 0;
       });
       return sorted;
-    },
-
-    getCampaignLink(campaign) {
-      if (!campaign.id) return null;
-      const actId = this.adAccountId.startsWith('act_') ? this.adAccountId : `act_${this.adAccountId}`;
-      return `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${actId}&selected_campaign_ids=${campaign.id}`;
     },
 
     getCampaignDate(campaign) {

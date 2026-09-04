@@ -427,14 +427,7 @@
                 <tbody>
                   <template x-for="campaign in sortedCampaigns" :key="campaign.name">
                     <tr class="border-b border-gray-50">
-                      <td class="py-2 text-sm text-gray-700">
-                        <template x-if="getCampaignLink(campaign)">
-                          <a :href="getCampaignLink(campaign)" target="_blank" class="text-brand-600 hover:text-brand-700 hover:underline" x-text="campaign.name"></a>
-                        </template>
-                        <template x-if="!getCampaignLink(campaign)">
-                          <span x-text="campaign.name"></span>
-                        </template>
-                      </td>
+                      <td class="py-2 text-sm text-gray-700" x-text="campaign.name"></td>
                       <td class="py-2 text-sm text-gray-500" x-text="getCampaignDate(campaign)"></td>
                       <td class="py-2">
                         <template x-if="campaign.status === 'ACTIVE'">
