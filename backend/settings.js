@@ -2,8 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const DATA_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, '../config');
-const SETTINGS_PATH = path.join(DATA_DIR, 'settings.json');
+const SETTINGS_PATH = path.join(__dirname, '../config/settings.json');
 const DEFAULT_PASSWORD = 'pasimokome';
 
 const SETTINGS_SCHEMA = {
@@ -131,7 +130,6 @@ function saveSettings(newSettings) {
     }
   }
 
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(SETTINGS_PATH, JSON.stringify(existing, null, 2));
 
   for (const [key, value] of Object.entries(existing)) {

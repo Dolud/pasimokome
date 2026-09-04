@@ -1,9 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-const MAPPINGS = JSON.parse(
-  fs.readFileSync(path.join(__dirname, '../config/sourceMapping.json'), 'utf8')
-);
+let MAPPINGS = { sources: {} };
+try {
+  MAPPINGS = JSON.parse(
+    fs.readFileSync(path.join(__dirname, 'sourceMapping.json'), 'utf8')
+  );
+} catch (e) {
+  console.warn('[sourceMatcher] sourceMapping.json not found, using empty mappings');
+}
 
 function removeLithuanianChars(str) {
   const map = {

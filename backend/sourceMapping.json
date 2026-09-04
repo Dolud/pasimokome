@@ -1,0 +1,40 @@
+{
+  "campaigns": [
+    {
+      "metaCampaign": "Profesijų pasaulis (lead generation)",
+      "allowedSources": ["profesiju pasaulis"]
+    },
+    {
+      "metaCampaign": "Gyvūnų pasaulis(lead generation)",
+      "allowedSources": ["gyvunu pasaulis"]
+    },
+    {
+      "metaCampaign": "Kūryba ir mokslas (lead generation)",
+      "allowedSources": ["kuryba ir mokslas"]
+    },
+    {
+      "metaCampaign": "Stovykla (lead generation)",
+      "allowedSources": ["stovykla"]
+    },
+    {
+      "metaCampaign": "Stovykla | Leads | CPCenhanced | VLNCountry",
+      "allowedSources": ["google"]
+    },
+    {
+      "metaCampaign": "Online pamokos (lead generation)",
+      "allowedSources": ["online pamokos"]
+    },
+    {
+      "metaCampaign": "Korepetitoriai (lead generation)",
+      "allowedSources": ["korepetitoriai"]
+    },
+    {
+      "metaCampaign": "Online pamokos",
+      "allowedSources": ["online pamokos"]
+    },
+    {
+      "metaCampaign": "Vasaros Akcija (lead generation)",
+      "allowedSources": ["vasaros akcija"]
+    }
+  ]
+}
