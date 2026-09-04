@@ -1102,16 +1102,7 @@ app.get('/api/campaigns/scan', async (req, res) => {
 });
 
 app.get('/api/campaigns', (req, res) => {
-  const mapping = getAllMappings();
-  const campaigns = {};
-  for (const [name, val] of Object.entries(mapping)) {
-    if (typeof val === 'string') {
-      campaigns[name] = { category: val };
-    } else {
-      campaigns[name] = val;
-    }
-  }
-  res.json({ success: true, mappings: campaigns });
+  res.json({ success: true, mappings: getAllMappings() });
 });
 
 app.post('/api/campaigns', (req, res) => {
@@ -1120,15 +1111,7 @@ app.post('/api/campaigns', (req, res) => {
     if (!campaigns || typeof campaigns !== 'object') {
       return res.status(400).json({ success: false, error: 'Invalid data' });
     }
-    const cleaned = {};
-    for (const [name, val] of Object.entries(campaigns)) {
-      if (typeof val === 'object' && val !== null) {
-        cleaned[name] = { category: val.category, id: val.id || null, status: val.status || null, createdTime: val.createdTime || null };
-      } else {
-        cleaned[name] = { category: val };
-      }
-    }
-    saveMapping({ campaigns: cleaned });
+    saveMapping({ campaigns });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });

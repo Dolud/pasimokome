@@ -63,12 +63,12 @@ function nustatymaiApp() {
             this.authenticated = true;
             this.settings = res.settings;
             this.initShowFields();
-            this.loadExistingCampaigns();
             this.loadProducts();
             this.testAll();
             this.generateYears();
             this.generateMonths();
             this.loadBudgets();
+            this.scanCampaigns();
           } else {
             this.token = null;
             localStorage.removeItem('settings_token');
@@ -88,21 +88,6 @@ function nustatymaiApp() {
           }
         }
       }
-    },
-
-    async loadExistingCampaigns() {
-      try {
-        const res = await this.api('GET', '/api/campaigns');
-        if (res.success && res.mappings) {
-          this.campaigns = Object.entries(res.mappings).map(([name, val]) => ({
-            name,
-            category: val.category || val,
-            id: val.id || null,
-            status: val.status || null,
-            createdTime: val.createdTime || null,
-          }));
-        }
-      } catch (e) {}
     },
 
     async loadProducts() {
@@ -129,12 +114,12 @@ function nustatymaiApp() {
           localStorage.setItem('settings_token', data.token);
           this.authenticated = true;
           await this.loadSettings();
-          this.loadExistingCampaigns();
           this.loadProducts();
           this.testAll();
           this.generateYears();
           this.generateMonths();
           this.loadBudgets();
+          this.scanCampaigns();
         } else {
           this.loginError = data.error || 'Klaida';
         }
@@ -230,9 +215,19 @@ function nustatymaiApp() {
     async scanCampaigns() {
       this.scanningCampaigns = true;
       try {
-        const res = await this.api('GET', '/api/campaigns/scan');
-        if (res.success) {
-          this.campaigns = res.campaigns;
+        const [scanRes, mapRes] = await Promise.all([
+          this.api('GET', '/api/campaigns/scan'),
+          this.api('GET', '/api/campaigns'),
+        ]);
+        const savedCategories = (mapRes.success && mapRes.mappings) ? mapRes.mappings : {};
+        if (scanRes.success) {
+          this.campaigns = scanRes.campaigns.map(c => ({
+            name: c.name,
+            id: c.id,
+            status: c.status,
+            createdTime: c.createdTime,
+            category: savedCategories[c.name] || c.category,
+          }));
         }
       } catch (e) {}
       this.scanningCampaigns = false;
@@ -243,7 +238,7 @@ function nustatymaiApp() {
       try {
         const payload = {};
         for (const c of this.campaigns) {
-          payload[c.name] = { category: c.category, id: c.id, status: c.status, createdTime: c.createdTime };
+          payload[c.name] = c.category;
         }
         const res = await this.api('POST', '/api/campaigns', { campaigns: payload });
         if (res.success) {
