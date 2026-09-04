@@ -54,6 +54,7 @@ function settingsApp() {
             this.initShowFields();
             this.loadExistingCampaigns();
             this.loadProducts();
+            this.testAll();
           } else {
             this.token = null;
             localStorage.removeItem('settings_token');
@@ -110,6 +111,9 @@ function settingsApp() {
           localStorage.setItem('settings_token', data.token);
           this.authenticated = true;
           await this.loadSettings();
+          this.loadExistingCampaigns();
+          this.loadProducts();
+          this.testAll();
         } else {
           this.loginError = data.error || 'Klaida';
         }
