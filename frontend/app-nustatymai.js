@@ -342,6 +342,15 @@ function nustatymaiApp() {
       return ((deals / leads) * 100).toFixed(1) + '%';
     },
 
+    getLeadsPrice(monthKey) {
+      const entry = this.budgets[monthKey];
+      if (!entry) return '—';
+      const daily = parseFloat(entry.daily) || 0;
+      const leads = parseFloat(entry.leads_daily) || 0;
+      if (leads === 0) return '—';
+      return (daily / leads).toFixed(2);
+    },
+
     getAutoConversionPrice(monthKey) {
       const entry = this.budgets[monthKey];
       if (!entry) return '';
