@@ -80,13 +80,14 @@ async function paginate(path, params = {}) {
 async function getAllCampaigns() {
   const adAccountId = getAdAccountId();
   const rows = await paginate(`${adAccountId}/campaigns`, {
-    fields: 'name,id,status',
+    fields: 'name,id,status,created_time',
     limit: '100'
   });
   return rows.filter(c => c.status !== 'ARCHIVED').map(c => ({
     campaignId: c.id,
     campaignName: c.name,
     status: c.status,
+    createdTime: c.created_time || null,
   }));
 }
 

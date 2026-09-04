@@ -1087,11 +1087,15 @@ app.get('/api/campaigns/scan', async (req, res) => {
     const { getAllCampaigns } = require('./meta');
     const allCampaigns = await getAllCampaigns();
     const mapping = getAllMappings();
+    const adAccountId = process.env.META_AD_ACCOUNT_ID || '';
     const result = allCampaigns.map(c => ({
       name: c.campaignName,
+      id: c.campaignId,
+      status: c.status,
+      createdTime: c.createdTime,
       category: mapping[c.campaignName] || autoDetectCategory(c.campaignName),
     }));
-    res.json({ success: true, campaigns: result });
+    res.json({ success: true, campaigns: result, adAccountId });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

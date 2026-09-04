@@ -23,6 +23,8 @@ function nustatymaiApp() {
     products: [],
     scanningCampaigns: false,
     savingCampaigns: false,
+    adAccountId: '',
+    campaignSort: { field: 'createdTime', dir: 'desc' },
 
     budgets: {},
     budgetSaving: false,
@@ -94,7 +96,7 @@ function nustatymaiApp() {
         const res = await this.api('GET', '/api/campaigns');
         if (res.success && res.mappings) {
           this.campaigns = Object.entries(res.mappings).map(([name, category]) => ({
-            name, category
+            name, category, id: null, status: null, createdTime: null
           }));
         }
       } catch (e) {}
@@ -228,6 +230,7 @@ function nustatymaiApp() {
         const res = await this.api('GET', '/api/campaigns/scan');
         if (res.success) {
           this.campaigns = res.campaigns;
+          this.adAccountId = res.adAccountId || '';
         }
       } catch (e) {}
       this.scanningCampaigns = false;
@@ -248,6 +251,49 @@ function nustatymaiApp() {
         }
       } catch (e) {}
       this.savingCampaigns = false;
+    },
+
+    sortCampaigns(field) {
+      if (this.campaignSort.field === field) {
+        this.campaignSort.dir = this.campaignSort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        this.campaignSort.field = field;
+        this.campaignSort.dir = field === 'createdTime' ? 'desc' : 'asc';
+      }
+    },
+
+    get sortedCampaigns() {
+      const sorted = [...this.campaigns].sort((a, b) => {
+        const field = this.campaignSort.field;
+        let valA = a[field] || '';
+        let valB = b[field] || '';
+        if (field === 'createdTime') {
+          valA = valA ? new Date(valA).getTime() : 0;
+          valB = valB ? new Date(valB).getTime() : 0;
+        } else {
+          valA = String(valA).toLowerCase();
+          valB = String(valB).toLowerCase();
+        }
+        if (valA < valB) return this.campaignSort.dir === 'asc' ? -1 : 1;
+        if (valA > valB) return this.campaignSort.dir === 'asc' ? 1 : -1;
+        return 0;
+      });
+      return sorted;
+    },
+
+    getCampaignLink(campaign) {
+      if (!campaign.id) return null;
+      const actId = this.adAccountId.replace('act_', '');
+      return `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${actId}&campaign_id=${campaign.id}`;
+    },
+
+    getCampaignDate(campaign) {
+      if (!campaign.createdTime) return '';
+      try {
+        return new Date(campaign.createdTime).toLocaleDateString('lt-LT');
+      } catch (e) {
+        return '';
+      }
     },
 
     async api(method, url, body) {
