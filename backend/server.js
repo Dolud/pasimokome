@@ -1573,30 +1573,6 @@ app.get('/api/debug/sheets', async (req, res) => {
   }
 });
 
-app.get('/api/debug/source-mappings', (req, res) => {
-  const fs = require('fs');
-  let rawFile = null;
-  try {
-    rawFile = fs.readFileSync(require('path').join(__dirname, 'sourceMapping.json'), 'utf8');
-  } catch (e) {
-    rawFile = 'ERROR: ' + e.message;
-  }
-  let parsed = null;
-  try { parsed = JSON.parse(rawFile); } catch (e) { parsed = 'parse error: ' + e.message; }
-  const testCampaigns = [
-    'Online pamokos (lead generation)',
-    'Online pamokos',
-    'Vasaros Akcija (lead generation)',
-    'Korepetitoriai (lead generation)',
-    'Stovykla (lead generation)'
-  ];
-  const results = testCampaigns.map(name => ({
-    campaign: name,
-    allowedSources: getAllowedSources(name)
-  }));
-  res.json({ campaignsInFile: parsed && parsed.campaigns ? parsed.campaigns.length : 'N/A', results });
-});
-
 process.on('unhandledRejection', (err) => {
   console.error('Unhandled rejection:', err.message);
 });
