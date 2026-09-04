@@ -333,6 +333,26 @@ function nustatymaiApp() {
       this.budgets[monthKey][field] = value;
     },
 
+    getConversion(monthKey) {
+      const entry = this.budgets[monthKey];
+      if (!entry) return '—';
+      const leads = parseFloat(entry.leads_daily) || 0;
+      const deals = parseFloat(entry.deals_daily) || 0;
+      if (leads === 0) return '—';
+      return ((deals / leads) * 100).toFixed(1) + '%';
+    },
+
+    getAutoConversionPrice(monthKey) {
+      const entry = this.budgets[monthKey];
+      if (!entry) return '';
+      const daily = parseFloat(entry.daily) || 0;
+      const leads = parseFloat(entry.leads_daily) || 0;
+      const deals = parseFloat(entry.deals_daily) || 0;
+      if (deals === 0 || leads === 0) return '';
+      const conversion = (deals / leads) * 100;
+      return ((daily / deals) * (100 / conversion)).toFixed(2);
+    },
+
     async loadBudgets() {
       this.generateMonths();
       try {
