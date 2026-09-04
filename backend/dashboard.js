@@ -1,4 +1,4 @@
-const { matchSource } = require('./sourceMatcher');
+const { matchSource, getAllowedSources } = require('./sourceMatcher');
 const { calculateSpendWithVAT, calculateCPL, calculateStats } = require('./calculations');
 
 function resolveLeadSource(lead, sourceStatusMap) {
@@ -106,15 +106,18 @@ function buildDashboard(metaCampaigns, bitrixLeads, sourceStatusMap) {
 
   const stats = calculateStats(enriched);
 
-  const campaignTable = enriched.map(c => ({
-    metaCampaign: c.campaignName,
-    crmSource: c.matchedLeads.length > 0
-      ? resolveLeadSource(c.matchedLeads[0], sourceStatusMap)
-      : '',
-    leads: c.leads,
-    spendWithVAT: c.spendWithVAT,
-    cpl: c.cpl
-  }));
+  const campaignTable = enriched.map(c => {
+    const allowedSources = getAllowedSources(c.campaignName);
+    return {
+      metaCampaign: c.campaignName,
+      crmSource: c.matchedLeads.length > 0
+        ? resolveLeadSource(c.matchedLeads[0], sourceStatusMap)
+        : allowedSources.length > 0 ? allowedSources[0] : '',
+      leads: c.leads,
+      spendWithVAT: c.spendWithVAT,
+      cpl: c.cpl
+    };
+  });
 
   const leadTable = bitrixLeads.map(lead => ({
     id: lead.ID,
