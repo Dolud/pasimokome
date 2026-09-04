@@ -283,8 +283,8 @@ function nustatymaiApp() {
 
     getCampaignLink(campaign) {
       if (!campaign.id) return null;
-      const actId = this.adAccountId.replace('act_', '');
-      return `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${actId}&campaign_id=${campaign.id}`;
+      const actId = this.adAccountId.startsWith('act_') ? this.adAccountId : `act_${this.adAccountId}`;
+      return `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${actId}&selected_campaign_ids=${campaign.id}`;
     },
 
     getCampaignDate(campaign) {
