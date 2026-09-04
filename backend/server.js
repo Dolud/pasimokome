@@ -1574,6 +1574,15 @@ app.get('/api/debug/sheets', async (req, res) => {
 });
 
 app.get('/api/debug/source-mappings', (req, res) => {
+  const fs = require('fs');
+  let rawFile = null;
+  try {
+    rawFile = fs.readFileSync(require('path').join(__dirname, 'sourceMapping.json'), 'utf8');
+  } catch (e) {
+    rawFile = 'ERROR: ' + e.message;
+  }
+  let parsed = null;
+  try { parsed = JSON.parse(rawFile); } catch (e) { parsed = 'parse error: ' + e.message; }
   const testCampaigns = [
     'Online pamokos (lead generation)',
     'Online pamokos',
@@ -1583,10 +1592,9 @@ app.get('/api/debug/source-mappings', (req, res) => {
   ];
   const results = testCampaigns.map(name => ({
     campaign: name,
-    normalized: normalizeSource(name),
     allowedSources: getAllowedSources(name)
   }));
-  res.json({ results });
+  res.json({ campaignsInFile: parsed && parsed.campaigns ? parsed.campaigns.length : 'N/A', results });
 });
 
 process.on('unhandledRejection', (err) => {
