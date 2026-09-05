@@ -540,10 +540,9 @@ app.get('/api/dashboard', async (req, res) => {
     dashboard.campaignTable.push(...googleAdsRows);
 
     let totalSpend = dashboard.campaignTable.reduce((s, c) => s + (c.spendWithVAT || 0), 0);
-    let totalLeads = dashboard.campaignTable.reduce((s, c) => s + (c.leads || 0), 0);
     dashboard.stats.totalSpend = Math.round(totalSpend * 100) / 100;
-    dashboard.stats.totalLeads = totalLeads;
-    dashboard.stats.averageCPL = totalLeads > 0 ? Math.round((totalSpend / totalLeads) * 100) / 100 : 0;
+    dashboard.stats.totalLeads = bitrixLeads.length;
+    dashboard.stats.averageCPL = bitrixLeads.length > 0 ? Math.round((totalSpend / bitrixLeads.length) * 100) / 100 : 0;
     dashboard.stats.totalCampaigns = dashboard.campaignTable.length;
 
     res.json({ success: true, ...dashboard });
@@ -790,10 +789,9 @@ app.get('/api/online-pamokos/dashboard', async (req, res) => {
     dashboard.campaignTable.push(...googleAdsRows);
 
     let totalSpend = dashboard.campaignTable.reduce((s, c) => s + (c.spendWithVAT || 0), 0);
-    let totalLeads = dashboard.campaignTable.reduce((s, c) => s + (c.leads || 0), 0);
     dashboard.stats.totalSpend = Math.round(totalSpend * 100) / 100;
-    dashboard.stats.totalLeads = totalLeads;
-    dashboard.stats.averageCPL = totalLeads > 0 ? Math.round((totalSpend / totalLeads) * 100) / 100 : 0;
+    dashboard.stats.totalLeads = bitrixLeads.length;
+    dashboard.stats.averageCPL = bitrixLeads.length > 0 ? Math.round((totalSpend / bitrixLeads.length) * 100) / 100 : 0;
     dashboard.stats.totalCampaigns = dashboard.campaignTable.length;
 
     res.json({ success: true, ...dashboard });
