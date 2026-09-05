@@ -60,6 +60,36 @@ function saveDates(dates) {
   } catch (e) {}
 }
 
+function campaignBrandIcon(campaign) {
+  const name = (campaign.metaCampaign || '').toLowerCase();
+  const src = (campaign.crmSource || '').toLowerCase();
+  if (name.includes('google') || src.includes('google')) {
+    return 'brand/brand-google.svg';
+  }
+  return 'brand/brand-facebook.svg';
+}
+
+function shortCampaignName(campaign) {
+  let name = campaign.metaCampaign || campaign.crmSource || '-';
+  name = name.replace(/\s*\(lead generation\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+  return name || '-';
+}
+
+function updateEffectiveCampaign(campaignTable) {
+  const funded = (campaignTable || []).filter(c => (c.leads || 0) > 0 && (c.spendWithVAT || 0) > 0);
+  const bestCpl = funded.length
+    ? funded.reduce((a, b) => ((a.cpl || Infinity) <= (b.cpl || Infinity) ? a : b))
+    : null;
+
+  if (bestCpl) {
+    document.getElementById('effIcon').src = campaignBrandIcon(bestCpl);
+    document.getElementById('effIcon').alt = bestCpl.metaCampaign || '';
+    document.getElementById('effName').textContent = shortCampaignName(bestCpl);
+    document.getElementById('effValue').textContent = formatCurrency(bestCpl.cpl);
+    document.getElementById('effCount').textContent = bestCpl.leads;
+  }
+}
+
 function getDefaultDates() {
   const saved = loadSavedDates();
   if (saved && !isNaN(saved[0]) && !isNaN(saved[1])) {
@@ -145,11 +175,11 @@ async function loadDashboard() {
     document.getElementById('statSpend').textContent = formatCurrency(data.stats.totalSpend);
     document.getElementById('statLeads').textContent = data.stats.totalLeads;
     document.getElementById('statCPL').textContent = formatCurrency(data.stats.averageCPL);
-    document.getElementById('statCampaigns').textContent = data.stats.totalCampaigns;
     document.getElementById('leadsCountBadge').textContent = data.leadTable.length;
 
     populateLeadsTable(data.leadTable);
     populateCampaignsTable(data.campaignTable);
+    updateEffectiveCampaign(data.campaignTable);
 
     loadPlanas(dates.startDate, dates.endDate);
     loadLeadsPlanas(dates.startDate, dates.endDate);
