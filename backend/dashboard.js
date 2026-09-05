@@ -119,31 +119,6 @@ function buildDashboard(metaCampaigns, bitrixLeads, sourceStatusMap) {
     };
   });
 
-  const matchedLeadIds = new Set();
-  matchingResults.forEach(r => {
-    if (r.confidence >= 80) matchedLeadIds.add(String(r.leadId));
-  });
-
-  const unmatchedBySource = {};
-  bitrixLeads.forEach(lead => {
-    if (matchedLeadIds.has(String(lead.ID))) return;
-    const src = resolveLeadSource(lead, sourceStatusMap);
-    if (!unmatchedBySource[src]) {
-      unmatchedBySource[src] = { leads: 0, crmSource: src };
-    }
-    unmatchedBySource[src].leads++;
-  });
-
-  Object.values(unmatchedBySource).forEach(group => {
-    campaignTable.push({
-      metaCampaign: '-',
-      crmSource: group.crmSource,
-      leads: group.leads,
-      spendWithVAT: 0,
-      cpl: 0
-    });
-  });
-
   const leadTable = bitrixLeads.map(lead => ({
     id: lead.ID,
     name: lead.TITLE || lead.NAME || '',
