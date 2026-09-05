@@ -317,17 +317,19 @@
 
           <!-- Efektyviausia kampanija -->
           <div class="rounded-2xl bg-white p-5 md:p-6">
-            <div class="flex items-center justify-between gap-3 rounded-xl bg-gray-50 p-3.5 dark:bg-gray-900">
-              <div class="flex min-w-0 items-center gap-3">
-                <img id="effIcon" class="h-9 w-9 shrink-0 rounded-full bg-white p-1.5 shadow-sm dark:bg-white/[0.06]" alt="" src="brand/brand-facebook.svg">
-                <div class="min-w-0">
-                  <p class="flex items-center gap-2 truncate text-sm font-semibold text-gray-800 dark:text-white/90"><span id="effName" class="truncate">-</span><span id="effCount" class="bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500 flex items-center gap-1 rounded-full py-0.5 pr-2 pl-2 text-sm font-medium">0</span></p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400">Efektyviausia kampanija</p>
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl" style="background-color:#f6f6f7;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#564e4e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trophy"><path d="M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2"/><path d="M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2"/><path d="M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3"/><path d="M4 22h16"/><path d="M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z"/><path d="M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3"/></svg>
+            </div>
+            <div class="mt-5">
+              <span class="text-sm text-gray-500 dark:text-gray-400">Efektyviausia kampanija</span>
+              <div class="mt-2 flex items-center justify-between gap-3 rounded-xl bg-gray-50 p-3.5 dark:bg-gray-900">
+                <div class="flex min-w-0 items-center gap-3">
+                  <img id="effIcon" class="h-9 w-9 shrink-0 rounded-full bg-white p-1.5 shadow-sm dark:bg-white/[0.06]" alt="" src="brand/brand-facebook.svg">
+                  <div class="min-w-0">
+                    <p class="flex items-center gap-2 truncate text-sm font-semibold text-gray-800 dark:text-white/90"><span id="effName" class="truncate">-</span><span id="effCount" class="bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500 flex items-center gap-1 rounded-full py-0.5 pr-2 pl-2 text-sm font-medium">0</span></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Užklausos kaina: <span id="effValue" class="font-bold text-success-500 dark:text-success-500">-</span></p>
+                  </div>
                 </div>
-              </div>
-              <div class="shrink-0 text-right">
-                <p id="effValue" class="text-sm font-bold text-success-500 dark:text-success-500">-</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Užklausos kaina</p>
               </div>
             </div>
           </div>
