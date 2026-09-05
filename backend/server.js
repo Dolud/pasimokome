@@ -1335,6 +1335,27 @@ app.get('/api/leads-planas', async (req, res) => {
   }
 });
 
+app.get('/api/leads-price', async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    if (!startDate || !endDate) {
+      return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
+    }
+
+    const planas = await getPlanasAmount(startDate, endDate);
+    const leadsPlanas = await getLeadsPlanasAmount(startDate, endDate);
+
+    if (planas === null || leadsPlanas === null || leadsPlanas === 0) {
+      return res.json({ success: true, leadsPrice: null });
+    }
+
+    const leadsPrice = planas / leadsPlanas;
+    res.json({ success: true, leadsPrice });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.get('/api/deals/planas', async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
