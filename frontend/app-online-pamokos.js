@@ -64,9 +64,9 @@ function campaignBrandIcon(campaign) {
   const name = (campaign.metaCampaign || '').toLowerCase();
   const src = (campaign.crmSource || '').toLowerCase();
   if (name.includes('google') || src.includes('google')) {
-    return 'brand/brand-google.svg';
+    return '/brand/brand-google.svg';
   }
-  return 'brand/brand-facebook.svg';
+  return '/brand/brand-facebook.svg';
 }
 
 function shortCampaignName(campaign) {
