@@ -981,7 +981,8 @@ app.get('/api/online-pamokos/deals', async (req, res) => {
         totalSuma: Math.round(totalSuma * 100) / 100,
         totalPelnas: Math.round(totalPelnas * 100) / 100,
         averageCPL: totalKiekis > 0 ? Math.round((totalSpend / totalKiekis) * 100) / 100 : 0,
-        totalCampaigns: campaignStats.length
+        totalCampaigns: campaignStats.length,
+        roas: totalSpend > 0 ? Math.round((totalSuma / totalSpend) * 100) / 100 : 0
       },
       dealTable,
       campaignStats,
@@ -1423,6 +1424,103 @@ app.get('/api/online-pamokos/deals/planas', (req, res) => {
     }
     const planas = getLocalOnlinePamokosValue(startDate, endDate, 'daily');
     res.json({ success: true, planas });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/online-pamokos/deals/conversion-price', (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    if (!startDate || !endDate) {
+      return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
+    }
+
+    const months = new Set();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const current = new Date(start);
+    while (current <= end) {
+      months.add(getMonthSheetName(current));
+      current.setDate(current.getDate() + 1);
+    }
+
+    let totalDaily = 0;
+    let totalDealsDaily = 0;
+    for (const monthKey of months) {
+      const daily = getBudgetField(monthKey, 'daily');
+      const dealsDaily = getBudgetField(monthKey, 'deals_daily');
+      if (daily !== null && dealsDaily !== null) {
+        const days = getDaysInRange(startDate, endDate, monthKey);
+        totalDaily += daily * days;
+        totalDealsDaily += dealsDaily * days;
+      }
+    }
+
+    if (totalDealsDaily === 0) {
+      return res.json({ success: true, conversionPrice: null });
+    }
+
+    const conversionPrice = totalDaily / totalDealsDaily;
+    res.json({ success: true, conversionPrice });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/online-pamokos/deals/daily', async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+    if (!startDate || !endDate) {
+      return res.status(400).json({ success: false, error: 'startDate and endDate are required' });
+    }
+
+    const [metaDaily, googleDaily, bundle] = await Promise.all([
+      getDailyCampaignData(startDate, endDate, getOnlinePamokosCampaigns()),
+      getGoogleAdsDailyCampaignData(startDate, endDate).catch(() => []),
+      getDealBundleCached(startDate, endDate)
+    ]);
+    const dealTable = bundle.dealTable;
+
+    const spendByDate = {};
+    const addSpend = (rows) => {
+      rows.forEach(r => {
+        const key = r.date ? r.date.substring(0, 10) : null;
+        if (!key) return;
+        spendByDate[key] = (spendByDate[key] || 0) + calculateSpendWithVAT(r.spend);
+      });
+    };
+    addSpend(metaDaily);
+
+    const sumaByDate = {};
+    dealTable.forEach(entry => {
+      const key = entry.date ? entry.date.substring(0, 10) : null;
+      if (!key) return;
+      sumaByDate[key] = (sumaByDate[key] || 0) + entry.suma;
+    });
+
+    const labels = [];
+    const spend = [];
+    const suma = [];
+    const cursor = new Date(startDate + 'T00:00:00');
+    const last = new Date(endDate + 'T00:00:00');
+    while (cursor <= last) {
+      const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
+      labels.push(key);
+      spend.push(Math.round((spendByDate[key] || 0) * 100) / 100);
+      suma.push(Math.round((sumaByDate[key] || 0) * 100) / 100);
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    const totalSuma = suma.reduce((s, v) => s + v, 0);
+
+    res.json({
+      success: true,
+      labels,
+      spend,
+      suma,
+      totalSuma: Math.round(totalSuma * 100) / 100
+    });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }

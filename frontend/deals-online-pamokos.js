@@ -1,6 +1,9 @@
 let dealsDataTable = null;
 let campaignsDataTable = null;
+let dealsChart = null;
+let revenueChart = null;
 let flatpickrInstance = null;
+let dailyChart = null;
 
 const STORAGE_KEY = 'online_pamokos_deals_dates';
 
@@ -141,8 +144,9 @@ async function loadDealsDashboard() {
     document.getElementById('statKiekis').textContent = data.stats.totalKiekis;
     document.getElementById('statSuma').textContent = formatCurrency(data.stats.totalSuma);
     document.getElementById('statPelnas').textContent = formatCurrency(data.stats.totalPelnas);
-    document.getElementById('statCPL').textContent = formatCurrency(data.stats.averageCPL);
-    document.getElementById('statCampaigns').textContent = data.stats.totalCampaigns;
+    document.getElementById('statRoas').textContent = 'ROAS ' + data.stats.roas.toFixed(1) + 'x';
+    updatePelnasCard(data.stats.totalPelnas);
+    updateCampaignAnalysis(data.stats, data.campaignStats);
 
     document.getElementById('dealsCountBadge').textContent = data.dealTable.length;
     const totalSuma = data.dealTable.reduce((sum, d) => sum + (d.suma || 0), 0);
@@ -153,6 +157,8 @@ async function loadDealsDashboard() {
 
     loadPlanas(dates.startDate, dates.endDate);
     loadDealsPlanas(dates.startDate, dates.endDate);
+    loadConversionPrice(dates.startDate, dates.endDate);
+    loadDailyChart(dates.startDate, dates.endDate);
 
   } catch (error) {
     showError(`Error: ${error.message}`);
@@ -189,6 +195,256 @@ async function loadDealsPlanas(startDate, endDate) {
     document.getElementById('statDealsPlanas').textContent = '-';
   }
   updateDealsProgressBar();
+}
+
+let conversionPlan = 0;
+
+async function loadConversionPrice(startDate, endDate) {
+  try {
+    const response = await fetch(`/api/online-pamokos/deals/conversion-price?startDate=${startDate}&endDate=${endDate}`);
+    const data = await response.json();
+    if (data.success && data.conversionPrice !== null) {
+      conversionPlan = data.conversionPrice;
+      document.getElementById('statSumaPlanas').textContent = formatCurrency(data.conversionPrice);
+      updateSumaProgressBar();
+    }
+  } catch (error) {}
+}
+
+async function loadDailyChart(startDate, endDate) {
+  try {
+    const response = await fetch(`/api/online-pamokos/deals/daily?startDate=${startDate}&endDate=${endDate}`);
+    const data = await response.json();
+    if (data.success) {
+      renderDailyChart(data);
+    }
+  } catch (error) {}
+}
+
+function formatChartDate(dateStr) {
+  if (!dateStr) return '-';
+  const parts = dateStr.split('-');
+  if (parts.length < 3) return dateStr;
+  return `${parts[0]} ${parts[1]} ${parts[2]}`;
+}
+
+function renderDailyChart(data) {
+  const rangeEl = document.getElementById('dailyChartRange');
+  const totalEl = document.getElementById('dailyChartTotal');
+  const container = document.getElementById('dailyChart');
+  if (!rangeEl || !totalEl || !container) return;
+
+  if (data.labels && data.labels.length > 0) {
+    rangeEl.textContent = `${formatChartDate(data.labels[0])} - ${formatChartDate(data.labels[data.labels.length - 1])}`;
+  }
+  totalEl.textContent = formatCurrency(data.totalSuma);
+
+  if (typeof ApexCharts === 'undefined') return;
+
+  if (dailyChart) dailyChart.destroy();
+
+  const options = {
+    series: [
+      { name: 'Pardavimų suma', data: data.suma },
+      { name: 'Išleista marketingui', data: data.spend }
+    ],
+    legend: { show: false },
+    colors: ['#e15159', '#9CB9FF'],
+    chart: {
+      fontFamily: 'Inter, sans-serif',
+      height: 310,
+      type: 'area',
+      toolbar: { show: false }
+    },
+    fill: {
+      gradient: { enabled: true, opacityFrom: 0.55, opacityTo: 0 }
+    },
+    stroke: { curve: 'smooth', width: ['2', '2'] },
+    markers: { size: 0 },
+    grid: {
+      xaxis: { lines: { show: false } },
+      yaxis: { lines: { show: true } }
+    },
+    dataLabels: { enabled: false },
+    tooltip: {
+      x: { format: 'dd MMM yyyy' },
+      y: {
+        formatter: function(value) {
+          return formatCurrency(value);
+        }
+      }
+    },
+    xaxis: {
+      type: 'category',
+      categories: data.labels.map(l => formatChartDate(l)),
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+      tooltip: { enabled: false },
+      labels: { rotate: -45, rotateAlways: true, style: { fontSize: '11px' } }
+    },
+    yaxis: {
+      title: { style: { fontSize: '0px' } },
+      labels: {
+        formatter: function(value) {
+          return Math.round(value) + ' €';
+        }
+      }
+    }
+  };
+
+  dailyChart = new ApexCharts(container, options);
+  dailyChart.render();
+}
+
+function updateSumaProgressBar() {
+  const bar = document.getElementById('sumaProgressBar');
+  const sumaEl = document.getElementById('statSuma');
+  const planasEl = document.getElementById('statSumaPlanas');
+  if (!bar || !sumaEl || !planasEl) return;
+
+  const suma = parseEuroAmount(sumaEl.textContent);
+  const planas = parseEuroAmount(planasEl.textContent);
+  const percent = planas > 0 ? Math.min((suma / planas) * 100, 100) : 0;
+
+  bar.style.width = percent + '%';
+  bar.style.backgroundColor = spendGradientColor(percent);
+}
+
+function campaignBrandIcon(campaign) {
+  const name = (campaign.metaCampaign || '').toLowerCase();
+  const src = (campaign.crmSource || '').toLowerCase();
+  if (name.includes('google') || src.includes('google')) {
+    return 'brand/brand-google.svg';
+  }
+  return 'brand/brand-facebook.svg';
+}
+
+function shortCampaignName(campaign) {
+  let name = campaign.metaCampaign || campaign.crmSource || '-';
+  name = name.replace(/\s*\(lead generation\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+  return name || '-';
+}
+
+function updateCampaignAnalysis(stats, campaignStats) {
+  const funded = (campaignStats || []).filter(c => (c.spendWithVAT || 0) > 0);
+
+  const totalSpend = stats && stats.totalSpend != null ? stats.totalSpend : funded.reduce((s, c) => s + c.spendWithVAT, 0);
+  const totalKiekis = stats && stats.totalKiekis != null ? stats.totalKiekis : funded.reduce((s, c) => s + c.kiekis, 0);
+  const avgCPL = totalKiekis > 0 ? totalSpend / totalKiekis : 0;
+
+  const avgCPLEl = document.getElementById('statAvgCPL');
+  if (avgCPLEl) {
+    avgCPLEl.textContent = totalKiekis > 0 ? formatCurrency(avgCPL) : '-';
+    if (totalKiekis > 0) {
+      avgCPLEl.style.color = avgCPL > conversionPlan ? '#f46565' : '';
+    }
+  }
+
+  const cplPlanEl = document.getElementById('statAvgCPLPlan');
+  if (cplPlanEl) {
+    cplPlanEl.textContent = formatCurrency(conversionPlan);
+  }
+
+  updateCplProgressBar(avgCPL);
+
+  const withCPL = funded.filter(c => (c.cpl || 0) > 0 && (c.kiekis || 0) > 0);
+  const bestCpl = withCPL.length
+    ? withCPL.reduce((a, b) => (a.cpl <= b.cpl ? a : b))
+    : null;
+
+  const withSuma = funded.filter(c => (c.suma || 0) > 0);
+  const bestSuma = withSuma.length
+    ? withSuma.reduce((a, b) => (a.suma >= b.suma ? a : b))
+    : null;
+
+  let worst = null;
+  let worstScore = -Infinity;
+  funded.forEach(c => {
+    const hurt = (c.suma || 0) === 0 ? 1 : 0;
+    const score = hurt * 1000 + (c.spendWithVAT || 0);
+    const losArt = (c.pelnas || 0) < 0 ? -(c.pelnas || 0) : 0;
+    const total = score + losArt;
+    if (total > worstScore) {
+      worstScore = total;
+      worst = c;
+    }
+  });
+
+  if (bestCpl) {
+    document.getElementById('effIcon').src = campaignBrandIcon(bestCpl);
+    document.getElementById('effIcon').alt = bestCpl.metaCampaign || 'kampanija';
+    document.getElementById('effName').textContent = shortCampaignName(bestCpl);
+    document.getElementById('effValue').textContent = formatCurrency(bestCpl.cpl);
+    setAnalysisCount('effCount', bestCpl.kiekis);
+  }
+
+  if (bestSuma) {
+    document.getElementById('salesIcon').src = campaignBrandIcon(bestSuma);
+    document.getElementById('salesIcon').alt = bestSuma.metaCampaign || 'kampanija';
+    document.getElementById('salesName').textContent = shortCampaignName(bestSuma);
+    document.getElementById('salesValue').textContent = formatCurrency(bestSuma.suma);
+    setAnalysisCount('salesCount', bestSuma.kiekis);
+  }
+
+  if (worst) {
+    document.getElementById('worstIcon').src = campaignBrandIcon(worst);
+    document.getElementById('worstIcon').alt = worst.metaCampaign || 'kampanija';
+    document.getElementById('worstName').textContent = shortCampaignName(worst);
+    document.getElementById('worstValue').textContent = formatCurrency(worst.spendWithVAT || 0);
+    setAnalysisCount('worstCount', worst.kiekis);
+  }
+}
+
+function setAnalysisCount(id, kiekis) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const n = Number(kiekis || 0);
+  el.textContent = n;
+  if (n === 0) {
+    el.classList.add('text-error-600', 'bg-error-50');
+    el.classList.remove('text-success-600', 'bg-success-50');
+  } else {
+    el.classList.add('text-success-600', 'bg-success-50');
+    el.classList.remove('text-error-600', 'bg-error-50');
+  }
+}
+
+function updateCplProgressBar(avgCPL) {
+  const bar = document.getElementById('cplProgressBar');
+  if (!bar) return;
+  const percent = conversionPlan > 0 ? Math.min((avgCPL / conversionPlan) * 100, 100) : 0;
+  bar.style.width = percent + '%';
+  bar.style.backgroundColor = avgCPL > conversionPlan ? '#f46565' : '#3AB493';
+}
+
+function updatePelnasCard(pelnas) {
+  const iconBox = document.getElementById('pelnasIconBox');
+  const icon = document.getElementById('pelnasIcon');
+  const sumaEl = document.getElementById('statPelnas');
+  const roasEl = document.getElementById('statRoas');
+  const slashEl = document.getElementById('pelnasSlash');
+  if (!iconBox || !icon || !sumaEl) return;
+
+  const negative = pelnas < 0;
+  if (negative) {
+    iconBox.style.backgroundColor = '#f565650f';
+    icon.classList.remove('text-success-500');
+    icon.classList.add('text-error-500');
+    icon.style.transform = 'scaleY(-1)';
+    icon.style.color = '#f56565';
+    sumaEl.style.color = '#f56565';
+    if (roasEl) roasEl.style.display = 'none';
+    if (slashEl) slashEl.style.display = 'none';
+  } else {
+    iconBox.style.backgroundColor = '';
+    icon.classList.add('text-success-500');
+    icon.classList.remove('text-error-500');
+    icon.style.transform = '';
+    icon.style.color = '';
+    sumaEl.style.color = '#3AB493';
+    if (roasEl) roasEl.style.display = '';
+    if (slashEl) slashEl.style.display = '';
+  }
 }
 
 function populateDealsTable(deals) {

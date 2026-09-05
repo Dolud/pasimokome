@@ -178,6 +178,7 @@
     <!-- Header -->
     <header class="sticky top-0 z-40 flex w-full border-b border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 lg:hidden">
       <div class="flex grow items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <!-- Mobile menu button -->
         <button
           @click="sidebarOpen = !sidebarOpen"
           class="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 text-gray-500 lg:hidden dark:border-gray-800 dark:text-gray-400"
@@ -187,7 +188,9 @@
           </svg>
         </button>
 
+        <!-- Right side -->
         <div class="flex items-center gap-3">
+          <!-- Dark mode toggle -->
           <button
             @click="darkMode = !darkMode"
             class="flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-500 hover:bg-white/80 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800"
@@ -303,64 +306,136 @@
 
         <!-- Total Suma -->
         <div class="rounded-2xl bg-white p-5 md:p-6">
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-500/10">
-            <svg class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
-            </svg>
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl" style="background-color:#f6f6f7;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#564e4e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5"/><path d="m16 19 3 3 3-3"/><path d="M18 12h.01"/><path d="M19 16v6"/><path d="M6 12h.01"/><circle cx="12" cy="12" r="2"/></svg>
           </div>
           <div class="mt-5 flex items-end justify-between">
             <div>
-              <span class="text-sm text-gray-500 dark:text-gray-400">Total Suma (EUR)</span>
-              <h4 id="statSuma" class="mt-2 text-title-sm font-bold text-purple-500 dark:text-purple-400">-</h4>
+              <span class="text-sm text-gray-500 dark:text-gray-400">Pardavimų suma</span>
+              <div class="mt-2 flex items-baseline gap-1.5">
+                <h4 id="statSuma" class="text-[30px] font-bold text-gray-800 dark:text-white/90">-</h4>
+                <span class="text-lg font-medium text-gray-400 dark:text-gray-500">/</span>
+                <h4 id="statSumaPlanas" class="text-lg font-bold text-brand-500">-</h4>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="relative w-full h-2 rounded-full bg-gray-200 dark:bg-gray-800">
+              <div id="sumaProgressBar" class="absolute left-0 h-full rounded-full transition-all duration-500" style="width:0%; background-color:#3AB493;"></div>
             </div>
           </div>
         </div>
 
         <!-- Total Pelnas -->
         <div class="rounded-2xl bg-white p-5 md:p-6">
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-success-50 dark:bg-success-500/10">
-            <svg class="h-6 w-6 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+          <div id="pelnasIconBox" class="flex h-12 w-12 items-center justify-center rounded-xl bg-success-50 dark:bg-success-500/10">
+            <svg id="pelnasIcon" class="h-6 w-6 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
             </svg>
           </div>
           <div class="mt-5 flex items-end justify-between">
             <div>
-              <span class="text-sm text-gray-500 dark:text-gray-400">Total Pelnas (EUR)</span>
-              <h4 id="statPelnas" class="mt-2 text-title-sm font-bold text-success-500 dark:text-success-400">-</h4>
+              <span class="text-sm text-gray-500 dark:text-gray-400">Pelnas</span>
+              <div class="mt-2 flex items-baseline gap-1.5">
+                <h4 id="statPelnas" class="text-[30px] font-bold" style="color:#3AB493;">-</h4>
+                <span id="pelnasSlash" class="text-lg font-medium text-gray-400 dark:text-gray-500">/</span>
+                <h4 id="statRoas" class="text-lg font-bold text-gray-800 dark:text-white/90">ROAS</h4>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- Stats Grid Row 2 -->
-      <div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6">
-        <!-- Average CPL -->
-        <div class="rounded-2xl bg-white p-5 md:p-6">
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-warning-50 dark:bg-warning-500/10">
-            <svg class="h-6 w-6 text-warning-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.121 7.629A3 3 0 009.017 9.43c-.023.212-.002.425.028.636l.506 3.541a4.5 4.5 0 01-.43 2.65L9 16.5l1.539-.513a2.25 2.25 0 011.422.08l2.416 1.32M14.121 7.629l-2.549-1.7a.75.75 0 00-.894.108l-.573.573a.75.75 0 00-.108.894l1.7 2.549M14.121 7.629l2.549 1.7a.75.75 0 00.894-.108l.573-.573a.75.75 0 00-.108-.894l-2.549-1.7m-6.614 8.876l-.573.573a.75.75 0 00-.108.894l1.7 2.549" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
-          <div class="mt-5 flex items-end justify-between">
+      <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3 md:gap-6">
+        <!-- Pardavimai ir Reklamos islaidos daily chart -->
+        <div class="rounded-2xl bg-white px-5 pb-5 pt-5 sm:px-6 sm:pt-6 lg:col-span-2">
+          <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <span class="text-sm text-gray-500 dark:text-gray-400">Avg Cost / Lead (EUR)</span>
-              <h4 id="statCPL" class="mt-2 text-title-sm font-bold text-warning-500 dark:text-warning-400">-</h4>
+              <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Pardavimai ir Reklamos išlaidos</h3>
+              <p id="dailyChartRange" class="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">-</p>
+            </div>
+            <div class="flex flex-row-reverse items-center justify-end gap-0.5 sm:flex-col sm:items-start">
+              <div class="flex flex-row-reverse items-center gap-3 sm:flex-row sm:gap-2">
+                <h4 id="dailyChartTotal" class="text-2xl font-bold text-gray-800 dark:text-white/90">-</h4>
+              </div>
+              <span class="text-gray-500 text-theme-xs dark:text-gray-400">Pardavimų suma</span>
             </div>
           </div>
+          <div id="dailyChart" class="-ml-4 min-w-full"></div>
         </div>
 
-        <!-- Active Campaigns -->
-        <div class="rounded-2xl bg-white p-5 md:p-6">
-          <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-light-50 dark:bg-blue-light-500/10">
-            <svg class="h-6 w-6 text-blue-light-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
-            </svg>
-          </div>
-          <div class="mt-5 flex items-end justify-between">
+        <!-- Kampanijų analizė -->
+        <div class="flex flex-col rounded-2xl bg-white p-5 md:p-6">
+          <!-- Vidutinė užklausos kaina -->
+          <div class="flex items-center gap-3">
+            <div class="flex h-12 w-12 items-center justify-center rounded-xl" style="background-color:#f6f6f7;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#564e4e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 15h2a2 2 0 1 0 0-4h-3c-.6 0-1.1.2-1.4.6L3 17"/><path d="m7 21 1.6-1.4c.3-.4.8-.6 1.4-.6h4c1.1 0 2.1-.4 2.8-1.2l4.6-4.4a2 2 0 0 0-2.75-2.91l-4.2 3.9"/><path d="m2 16 6 6"/><circle cx="16" cy="9" r="2.9"/><circle cx="6" cy="5" r="3"/></svg>
+            </div>
             <div>
-              <span class="text-sm text-gray-500 dark:text-gray-400">Active Campaigns</span>
-              <h4 id="statCampaigns" class="mt-2 text-title-sm font-bold text-gray-800 dark:text-white/90">-</h4>
+              <span class="text-sm text-gray-500 dark:text-gray-400">Vidutinė pardavimo kaina.</span>
+              <div class="mt-1 flex items-baseline gap-1.5">
+                <h4 id="statAvgCPL" class="text-2xl font-bold text-gray-800 dark:text-white/90">-</h4>
+                <span class="text-lg font-medium text-gray-400 dark:text-gray-500">/</span>
+                <h4 id="statAvgCPLPlan" class="text-lg font-bold text-brand-500">50.00 €</h4>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4">
+            <div class="relative w-full h-2 rounded-full bg-gray-200 dark:bg-gray-800">
+              <div id="cplProgressBar" class="absolute left-0 h-full rounded-full transition-all duration-500" style="width:0%; background-color:#3AB493;"></div>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">Kampanijų analizė</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Efektyviausios kampanijos</p>
+          </div>
+
+          <div class="mt-5 flex flex-col gap-3">
+            <!-- Most efficient campaign -->
+            <div class="flex items-center justify-between gap-3 rounded-xl bg-gray-50 p-3.5 dark:bg-gray-900">
+              <div class="flex min-w-0 items-center gap-3">
+                <img id="effIcon" class="h-9 w-9 shrink-0 rounded-full bg-white p-1.5 shadow-sm dark:bg-white/[0.06]" alt="" />
+                <div class="min-w-0">
+                  <p class="flex items-center gap-2 truncate text-sm font-semibold text-gray-800 dark:text-white/90"><span id="effName" class="truncate">-</span><span id="effCount" class="bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500 flex items-center gap-1 rounded-full py-0.5 pr-2 pl-2 text-sm font-medium">0</span></p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Efektyviausia kampanija</p>
+                </div>
+              </div>
+              <div class="shrink-0 text-right">
+                <p id="effValue" class="text-sm font-bold text-success-500 dark:text-success-500">-</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Užklausos kaina</p>
+              </div>
+            </div>
+
+            <!-- Most sales campaign -->
+            <div class="flex items-center justify-between gap-3 rounded-xl bg-gray-50 p-3.5 dark:bg-gray-900">
+              <div class="flex min-w-0 items-center gap-3">
+                <img id="salesIcon" class="h-9 w-9 shrink-0 rounded-full bg-white p-1.5 shadow-sm dark:bg-white/[0.06]" alt="" />
+                <div class="min-w-0">
+                  <p class="flex items-center gap-2 truncate text-sm font-semibold text-gray-800 dark:text-white/90"><span id="salesName" class="truncate">-</span><span id="salesCount" class="bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500 flex items-center gap-1 rounded-full px-2 py-0.5 text-sm font-medium">0</span></p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Daugiausia pardavimų</p>
+                </div>
+              </div>
+              <div class="shrink-0 text-right">
+                <p id="salesValue" class="text-sm font-bold text-brand-500 dark:text-brand-500">-</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Pardavimų suma</p>
+              </div>
+            </div>
+
+            <!-- Worst campaign -->
+            <div class="flex items-center justify-between gap-3 rounded-xl bg-gray-50 p-3.5 dark:bg-gray-900">
+              <div class="flex min-w-0 items-center gap-3">
+                <img id="worstIcon" class="h-9 w-9 shrink-0 rounded-full bg-white p-1.5 shadow-sm dark:bg-white/[0.06]" alt="" />
+                <div class="min-w-0">
+                  <p class="flex items-center gap-2 truncate text-sm font-semibold text-gray-800 dark:text-white/90"><span id="worstName" class="truncate">-</span><span id="worstCount" class="bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500 flex items-center gap-1 rounded-full px-2 py-0.5 text-sm font-medium">0</span></p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Prasciausia kampanija</p>
+                </div>
+              </div>
+              <div class="shrink-0 text-right">
+                <p id="worstValue" class="text-sm font-bold" style="color:#f46565;">-</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Išleista</p>
+              </div>
             </div>
           </div>
         </div>
@@ -444,6 +519,7 @@
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   <script src="/deals-online-pamokos.js"></script>
   <script src="/charts.js"></script>
 </body>
